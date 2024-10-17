@@ -1,0 +1,23 @@
+[
+  [
+    {
+      "id": "3e078a27-531d-45a4-9ad8-3b166cc86324"
+    },
+    {
+      "children": [],
+      "content": {
+        "createdAt": "2024-10-11T02:24:05.675476Z",
+        "datasetId": "N:dataset:e8484369-bdff-4a54-bbce-15ddc48597f5",
+        "datasetNodeId": "N:dataset:e8484369-bdff-4a54-bbce-15ddc48597f5",
+        "id": "N:collection:45229042-690d-4b4a-9a78-7c8e37a6ff20",
+        "name": "dog",
+        "nodeId": "N:collection:45229042-690d-4b4a-9a78-7c8e37a6ff20",
+        "ownerId": 172,
+        "packageType": "Collection",
+        "state": "READY",
+        "updatedAt": "2024-10-11T02:24:05.675476Z"
+      },
+      "properties": []
+    }
+  ]
+]

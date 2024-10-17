@@ -1,0 +1,352 @@
+[
+  {
+    "createdAt": "2024-10-01T18:56:14.315000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "6cb3c8f2-a32c-4047-bdbd-8670f4167bc2",
+    "type": "contributor",
+    "updatedAt": "2024-10-01T18:56:14.315000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Last Name",
+        "locked": false,
+        "name": "last_name",
+        "required": true,
+        "value": "Lauridsen"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "First Name",
+        "locked": false,
+        "name": "first_name",
+        "required": false,
+        "value": "Elara"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "NodeID",
+        "locked": false,
+        "name": "node_id",
+        "required": false,
+        "value": ""
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ORCID",
+        "locked": false,
+        "name": "orcid",
+        "required": false,
+        "value": null
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Degree",
+        "locked": false,
+        "name": "degree",
+        "required": false,
+        "value": null
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Middle Initial",
+        "locked": false,
+        "name": "middle_initial",
+        "required": false,
+        "value": null
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-01T18:57:43.578000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "36d5f186-22b3-41c2-8ec4-02000b13aab4",
+    "type": "contributor",
+    "updatedAt": "2024-10-01T18:57:43.578000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Degree",
+        "locked": false,
+        "name": "degree",
+        "required": false,
+        "value": "PHD"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Middle Initial",
+        "locked": false,
+        "name": "middle_initial",
+        "required": false,
+        "value": "T"
+      },
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Last Name",
+        "locked": false,
+        "name": "last_name",
+        "required": true,
+        "value": "Vukoja"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "First Name",
+        "locked": false,
+        "name": "first_name",
+        "required": false,
+        "value": "Yordanka"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "NodeID",
+        "locked": false,
+        "name": "node_id",
+        "required": false,
+        "value": null
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ORCID",
+        "locked": false,
+        "name": "orcid",
+        "required": false,
+        "value": null
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-01T18:59:44.239000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "e265d2ef-3eea-4aab-b2e0-e174f9550b60",
+    "type": "contributor",
+    "updatedAt": "2024-10-01T18:59:44.239000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Degree",
+        "locked": false,
+        "name": "degree",
+        "required": false,
+        "value": "BS"
+      },
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Last Name",
+        "locked": false,
+        "name": "last_name",
+        "required": true,
+        "value": "Naoumova"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "First Name",
+        "locked": false,
+        "name": "first_name",
+        "required": false,
+        "value": "Gobind"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "NodeID",
+        "locked": false,
+        "name": "node_id",
+        "required": false,
+        "value": "N:user:3ea5435b-e4d5-4e74-b18c-0a42bea75be5"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ORCID",
+        "locked": false,
+        "name": "orcid",
+        "required": false,
+        "value": null
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Middle Initial",
+        "locked": false,
+        "name": "middle_initial",
+        "required": false,
+        "value": null
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-01T19:00:30.804000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "2d0b3c8c-98a8-42cc-b0a0-e499027db359",
+    "type": "contributor",
+    "updatedAt": "2024-10-01T19:00:30.804000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Last Name",
+        "locked": false,
+        "name": "last_name",
+        "required": true,
+        "value": "Strickland"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ORCID",
+        "locked": false,
+        "name": "orcid",
+        "required": false,
+        "value": "https://orcid.org/8ce7bc59-b562-46ca-94f4-9b44fc2cfe4a"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "First Name",
+        "locked": false,
+        "name": "first_name",
+        "required": false,
+        "value": "Zebedee"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "NodeID",
+        "locked": false,
+        "name": "node_id",
+        "required": false,
+        "value": null
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Degree",
+        "locked": false,
+        "name": "degree",
+        "required": false,
+        "value": null
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Middle Initial",
+        "locked": false,
+        "name": "middle_initial",
+        "required": false,
+        "value": null
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-01T19:01:53.176000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "c2750b18-e368-4fa3-b13e-d1caf91f8158",
+    "type": "contributor",
+    "updatedAt": "2024-10-01T19:01:53.176000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Last Name",
+        "locked": false,
+        "name": "last_name",
+        "required": true,
+        "value": "Carstensen"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ORCID",
+        "locked": false,
+        "name": "orcid",
+        "required": false,
+        "value": "https://orcid.org/a1482559-3881-4466-b98f-d4240d9d467d"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "First Name",
+        "locked": false,
+        "name": "first_name",
+        "required": false,
+        "value": "Ajay"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "NodeID",
+        "locked": false,
+        "name": "node_id",
+        "required": false,
+        "value": "N:user:3478dd52-e229-4e95-ab23-c6bd1e3d4d25"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Degree",
+        "locked": false,
+        "name": "degree",
+        "required": false,
+        "value": null
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Middle Initial",
+        "locked": false,
+        "name": "middle_initial",
+        "required": false,
+        "value": null
+      }
+    ]
+  }
+]
