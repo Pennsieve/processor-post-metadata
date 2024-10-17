@@ -1,0 +1,15 @@
+[
+  {
+    "createdAt": "2024-10-11T02:25:44.199000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "description": "",
+    "displayName": "Belongs To",
+    "from": null,
+    "id": "e18a8519-8368-4062-977a-60707c9c93ec",
+    "name": "belongs_to",
+    "schema": [],
+    "to": null,
+    "updatedAt": "2024-10-11T02:25:44.199000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42"
+  }
+]

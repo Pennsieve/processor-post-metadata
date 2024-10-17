@@ -1,0 +1,53 @@
+[
+  {
+    "conceptTitle": false,
+    "createdAt": "2024-10-03T02:52:54.051000+00:00",
+    "dataType": {
+      "items": {
+        "format": null,
+        "type": "String"
+      },
+      "type": "array"
+    },
+    "default": false,
+    "defaultValue": null,
+    "description": "",
+    "displayName": "Species Synonyms",
+    "id": "17e27cf1-9f44-41c0-8f9d-dc785676cfc7",
+    "index": 0,
+    "locked": false,
+    "name": "species_synonyms",
+    "required": false,
+    "updatedAt": "2024-10-03T02:52:54.051000+00:00"
+  },
+  {
+    "conceptTitle": false,
+    "createdAt": "2024-10-03T02:52:26.368000+00:00",
+    "dataType": "String",
+    "default": false,
+    "defaultValue": null,
+    "description": "",
+    "displayName": "Species",
+    "id": "81915b5b-dcb7-4df6-a83c-4d68c00c05b5",
+    "index": 0,
+    "locked": false,
+    "name": "species",
+    "required": false,
+    "updatedAt": "2024-10-03T02:52:26.368000+00:00"
+  },
+  {
+    "conceptTitle": true,
+    "createdAt": "2024-10-03T02:52:13.710000+00:00",
+    "dataType": "String",
+    "default": false,
+    "defaultValue": null,
+    "description": "",
+    "displayName": "ID",
+    "id": "c3e53c94-db4f-4553-88de-8979ad5de9d6",
+    "index": 0,
+    "locked": false,
+    "name": "id",
+    "required": true,
+    "updatedAt": "2024-10-03T02:52:13.710000+00:00"
+  }
+]

@@ -1,0 +1,149 @@
+[
+  {
+    "createdAt": "2024-10-03T02:55:25.210000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "b5ad14ab-f9e7-480b-b929-8e56db504181",
+    "type": "subject",
+    "updatedAt": "2024-10-03T02:55:25.210000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": false,
+        "dataType": {
+          "items": {
+            "format": null,
+            "type": "String"
+          },
+          "type": "array"
+        },
+        "default": false,
+        "displayName": "Species Synonyms",
+        "locked": false,
+        "name": "species_synonyms",
+        "required": false,
+        "value": [
+          "brown rat",
+          "Norway rat",
+          "rat",
+          "Mus norvegicus",
+          "rats"
+        ]
+      },
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ID",
+        "locked": false,
+        "name": "id",
+        "required": true,
+        "value": "f1027e6e-17cf-45d7-8b57-4c91bfd93fce"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Species",
+        "locked": false,
+        "name": "species",
+        "required": false,
+        "value": "Rattus norvegicus"
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-03T02:57:10.677000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "c823ae0b-0c83-48be-9b0e-16690f6e675e",
+    "type": "subject",
+    "updatedAt": "2024-10-03T02:57:10.677000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ID",
+        "locked": false,
+        "name": "id",
+        "required": true,
+        "value": "a9ea0803-651b-4f0e-bda5-e2430e235e94"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Species",
+        "locked": false,
+        "name": "species",
+        "required": false,
+        "value": "canis lupus familiaris"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": {
+          "items": {
+            "format": null,
+            "type": "String"
+          },
+          "type": "array"
+        },
+        "default": false,
+        "displayName": "Species Synonyms",
+        "locked": false,
+        "name": "species_synonyms",
+        "required": false,
+        "value": null
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-11T02:22:22.976000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "a6725f6b-4504-490f-90bc-f21765d0cb07",
+    "type": "subject",
+    "updatedAt": "2024-10-11T02:22:22.976000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": false,
+        "dataType": {
+          "items": {
+            "format": null,
+            "type": "String"
+          },
+          "type": "array"
+        },
+        "default": false,
+        "displayName": "Species Synonyms",
+        "locked": false,
+        "name": "species_synonyms",
+        "required": false,
+        "value": [
+          "dog",
+          "pooch"
+        ]
+      },
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ID",
+        "locked": false,
+        "name": "id",
+        "required": true,
+        "value": "dog-123"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "Species",
+        "locked": false,
+        "name": "species",
+        "required": false,
+        "value": "dog"
+      }
+    ]
+  }
+]

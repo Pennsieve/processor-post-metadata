@@ -1,0 +1,32 @@
+[
+  {
+    "conceptTitle": true,
+    "createdAt": "2024-10-07T19:20:56.219000+00:00",
+    "dataType": "String",
+    "default": false,
+    "defaultValue": null,
+    "description": "",
+    "displayName": "ID",
+    "id": "6f4db5a9-4c11-4b7a-948b-218cca549256",
+    "index": 0,
+    "locked": false,
+    "name": "id",
+    "required": true,
+    "updatedAt": "2024-10-15T19:56:49.781000+00:00"
+  },
+  {
+    "conceptTitle": false,
+    "createdAt": "2024-10-15T19:56:49.781000+00:00",
+    "dataType": "String",
+    "default": false,
+    "defaultValue": null,
+    "description": "",
+    "displayName": "PrimaryKey",
+    "id": "67d127da-3c33-4824-8f9b-ef7492540a50",
+    "index": 1,
+    "locked": false,
+    "name": "primary_key",
+    "required": false,
+    "updatedAt": "2024-10-15T19:56:49.781000+00:00"
+  }
+]

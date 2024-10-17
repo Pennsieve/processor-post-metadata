@@ -1,0 +1,92 @@
+[
+  {
+    "createdAt": "2024-10-07T19:23:44.657000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "b66cbf32-cb9f-4126-8182-01bd00ad7b17",
+    "type": "sample",
+    "updatedAt": "2024-10-07T19:23:44.657000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ID",
+        "locked": false,
+        "name": "id",
+        "required": true,
+        "value": "967af4ee-eca9-4977-a74d-88713b82975f"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "PrimaryKey",
+        "locked": false,
+        "name": "primary_key",
+        "required": false,
+        "value": "f61ed5a9-5a69-49f7-9113-6447ee9e668b"
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-07T19:24:49.332000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "60f21224-481c-4e29-a325-c896f184aebe",
+    "type": "sample",
+    "updatedAt": "2024-10-07T19:24:49.332000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ID",
+        "locked": false,
+        "name": "id",
+        "required": true,
+        "value": "09d2a327-be38-403a-884d-a4d1d98b732c"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "PrimaryKey",
+        "locked": false,
+        "name": "primary_key",
+        "required": false,
+        "value": "rat-sample-pk-1"
+      }
+    ]
+  },
+  {
+    "createdAt": "2024-10-11T02:22:52.393000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "id": "cf811b54-bab7-49f1-b239-79c0f6cac29a",
+    "type": "sample",
+    "updatedAt": "2024-10-15T20:00:18.675000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "values": [
+      {
+        "conceptTitle": true,
+        "dataType": "String",
+        "default": false,
+        "displayName": "ID",
+        "locked": false,
+        "name": "id",
+        "required": true,
+        "value": "sample-689"
+      },
+      {
+        "conceptTitle": false,
+        "dataType": "String",
+        "default": false,
+        "displayName": "PrimaryKey",
+        "locked": false,
+        "name": "primary_key",
+        "required": false,
+        "value": "dog-sample-pk-5"
+      }
+    ]
+  }
+]

@@ -1,0 +1,46 @@
+[
+  [
+    {
+      "id": "1758ac9d-38db-4c95-b356-04900851b761"
+    },
+    {
+      "children": [],
+      "content": {
+        "createdAt": "2024-10-11T02:24:14.424666Z",
+        "datasetId": "N:dataset:e8484369-bdff-4a54-bbce-15ddc48597f5",
+        "datasetNodeId": "N:dataset:e8484369-bdff-4a54-bbce-15ddc48597f5",
+        "id": "N:collection:908d58fd-878f-4c98-8b15-b8092628c79e",
+        "name": "sample",
+        "nodeId": "N:collection:908d58fd-878f-4c98-8b15-b8092628c79e",
+        "ownerId": 172,
+        "packageType": "Collection",
+        "parentId": 1042133,
+        "state": "READY",
+        "updatedAt": "2024-10-11T02:24:14.424666Z"
+      },
+      "properties": []
+    }
+  ],
+  [
+    {
+      "id": "240951e1-1633-4c26-bfc5-dbbe2dbf17dc"
+    },
+    {
+      "children": [],
+      "content": {
+        "createdAt": "2024-10-11T02:47:56.303163Z",
+        "datasetId": "N:dataset:e8484369-bdff-4a54-bbce-15ddc48597f5",
+        "datasetNodeId": "N:dataset:e8484369-bdff-4a54-bbce-15ddc48597f5",
+        "id": "N:collection:4e21c210-1880-4ce7-b714-73fc969d66b9",
+        "name": "sample2",
+        "nodeId": "N:collection:4e21c210-1880-4ce7-b714-73fc969d66b9",
+        "ownerId": 172,
+        "packageType": "Collection",
+        "parentId": 1042133,
+        "state": "READY",
+        "updatedAt": "2024-10-11T02:47:56.303163Z"
+      },
+      "properties": []
+    }
+  ]
+]
