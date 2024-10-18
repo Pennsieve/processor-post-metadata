@@ -1,0 +1,215 @@
+{
+  "models": [
+    {
+      "id": "d77470bb-f39d-49ee-aa17-783e128cdfa0",
+      "records": {
+        "delete_all": true,
+        "delete": null,
+        "create": [
+          {
+            "values": [
+              {
+                "value": "Elara",
+                "name": "first_name"
+              },
+              {
+                "value": "Lauridsen",
+                "name": "last_name"
+              }
+            ]
+          },
+          {
+            "values": [
+              {
+                "value": "Ajay",
+                "name": "first_name"
+              },
+              {
+                "value": "Carstensen",
+                "name": "last_name"
+              },
+              {
+                "value": "https://orcid.org/a1482559-3881-4466-b98f-d4240d9d467d",
+                "name": "orcid"
+              },
+              {
+                "value": "N:user:3478dd52-e229-4e95-ab23-c6bd1e3d4d25",
+                "name": "node_id"
+              }
+            ]
+          },
+          {
+            "values": [
+              {
+                "value": "Yordanka",
+                "name": "first_name"
+              },
+              {
+                "value": "Ó",
+                "name": "middle_initial"
+              },
+              {
+                "value": "Vukoja",
+                "name": "last_name"
+              },
+              {
+                "value": "N:user:09b5d733-4c9e-4d3c-9842-1d4aead7f0b7",
+                "name": "node_id"
+              }
+            ]
+          }
+        ],
+        "update": null
+      }
+    },
+    {
+      "id": "44fe1f90-f7b5-407a-8689-c512d7f41b7d",
+      "records": {
+        "delete_all": false,
+        "delete": [
+          "a6725f6b-4504-490f-90bc-f21765d0cb07"
+        ],
+        "create": [
+          {
+            "values": [
+              {
+                "value": "9b942959-2ebb-4680-b3f7-6d1cdbbe706d",
+                "name": "id"
+              },
+              {
+                "value": "Canis familiaris",
+                "name": "species"
+              }
+            ]
+          },
+          {
+            "values": [
+              {
+                "value": "5061b8e3-086b-4e87-b2f0-08f1a5b96679",
+                "name": "id"
+              },
+              {
+                "value": "Canis familiaris",
+                "name": "species"
+              }
+            ]
+          }
+        ],
+        "update": null
+      }
+    },
+    {
+      "id": "29756423-00de-42f8-8706-acdcb1823685",
+      "records": {
+        "delete_all": false,
+        "delete": [
+          "b66cbf32-cb9f-4126-8182-01bd00ad7b17",
+          "cf811b54-bab7-49f1-b239-79c0f6cac29a"
+        ],
+        "create": [
+          {
+            "values": [
+              {
+                "value": "80e9d14c-188e-476d-99ae-464da9e68bc3",
+                "name": "id"
+              },
+              {
+                "value": "ef07f30e-ea93-4221-86e2-0be3a278ff55",
+                "name": "primary_key"
+              }
+            ]
+          },
+          {
+            "values": [
+              {
+                "value": "70a38ffa-15f6-4fdc-87ea-2f3a9b19f995",
+                "name": "id"
+              },
+              {
+                "value": "b07f1212-72c6-407e-b7b0-2020c9a35b19",
+                "name": "primary_key"
+              }
+            ]
+          }
+        ],
+        "update": [
+          {
+            "pennsieve_id": "60f21224-481c-4e29-a325-c896f184aebe",
+            "values": [
+              {
+                "value": "09d2a327-be38-403a-884d-a4d1d98b732c",
+                "name": "id"
+              },
+              {
+                "value": "f61ed5a9-5a69-49f7-9113-6447ee9e668b",
+                "name": "primary_key"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "linked_properties": [
+    {
+      "id": "cd43592f-6e8b-4ceb-b6a4-66fec2c39eb3",
+      "instances": {
+        "create": [
+          {
+            "from_external_id": "80e9d14c-188e-476d-99ae-464da9e68bc3",
+            "to_external_id": "f1027e6e-17cf-45d7-8b57-4c91bfd93fce"
+          },
+          {
+            "from_external_id": "70a38ffa-15f6-4fdc-87ea-2f3a9b19f995",
+            "to_external_id": "9b942959-2ebb-4680-b3f7-6d1cdbbe706d"
+          }
+        ],
+        "delete": [
+          {
+            "from_record_id": "b66cbf32-cb9f-4126-8182-01bd00ad7b17",
+            "instance_linked_property_id": "c148b5ae-10ff-4c41-bff6-0c0753a01e49"
+          }
+        ]
+      }
+    }
+  ],
+  "proxies": {
+    "create_proxy_relationship_schema": false,
+    "record_changes": [
+      {
+        "model_name": "sample",
+        "record_external_id": "09d2a327-be38-403a-884d-a4d1d98b732c",
+        "node_id_creates": [
+          "N:collection:57e23ec5-824f-4690-b615-83dbd5e4d626",
+          "N:collection:dfca46a1-ceba-44f5-a462-4ec9d61b6a5f"
+        ],
+        "instance_id_deletes": null
+      },
+      {
+        "model_name": "subject",
+        "record_external_id": "f1027e6e-17cf-45d7-8b57-4c91bfd93fce",
+        "node_id_creates": [
+          "N:collection:d1011339-b3a0-495d-bf94-76c1a1da1872"
+        ],
+        "instance_id_deletes": null
+      },
+      {
+        "model_name": "sample",
+        "record_external_id": "sample-689",
+        "node_id_creates": null,
+        "instance_id_deletes": [
+          "1758ac9d-38db-4c95-b356-04900851b761",
+          "240951e1-1633-4c26-bfc5-dbbe2dbf17dc"
+        ]
+      },
+      {
+        "model_name": "subject",
+        "record_external_id": "dog-123",
+        "node_id_creates": null,
+        "instance_id_deletes": [
+          "3e078a27-531d-45a4-9ad8-3b166cc86324"
+        ]
+      }
+    ]
+  }
+}

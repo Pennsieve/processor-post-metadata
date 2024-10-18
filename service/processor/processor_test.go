@@ -14,7 +14,7 @@ import (
 func TestCurationExportSyncProcessor_Run(t *testing.T) {
 	integrationID := uuid.NewString()
 	inputDirectory := "testdata/input"
-	outputDirectory := t.TempDir()
+	outputDirectory := "testdata/output"
 	sessionToken := uuid.NewString()
 
 	datasetID := newDatasetID()
