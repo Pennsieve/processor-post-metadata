@@ -1,9 +1,10 @@
 package processor
 
 import (
-	"encoding/json"
 	"github.com/google/uuid"
+	"github.com/pennsieve/processor-post-metadata/client/clienttest"
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
+	"github.com/pennsieve/processor-pre-metadata/client/models/datatypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -11,7 +12,8 @@ import (
 
 func TestMetadataPostProcessor_ProcessModelChanges(t *testing.T) {
 	for scenario, testFunc := range map[string]func(t *testing.T){
-		"create model": createModel,
+		"create model and record":             createModel,
+		"create record; model already exists": createRecordModelExists,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			testFunc(t)
@@ -21,42 +23,87 @@ func TestMetadataPostProcessor_ProcessModelChanges(t *testing.T) {
 
 func createModel(t *testing.T) {
 	datasetID := newDatasetID()
-	modelID := clientmodels.PennsieveInstanceID(uuid.NewString())
+	modelID := uuid.NewString()
 
-	modelCreate := clientmodels.ModelCreate{
-		Name:        uuid.NewString(),
-		DisplayName: uuid.NewString(),
-		Description: uuid.NewString(),
-		Locked:      false,
-	}
+	modelCreate := clienttest.NewModelCreate()
 
 	propertiesCreate := clientmodels.PropertiesCreate{
-		clientmodels.PropertyCreate{
-			DisplayName:  uuid.NewString(),
-			Name:         uuid.NewString(),
-			DataType:     json.RawMessage(`"String"`),
-			ConceptTitle: true,
-			Required:     true,
-		},
+		clienttest.NewPropertyCreateSimple(t, datatypes.StringType),
+		clienttest.NewPropertyCreateArray(t, datatypes.DoubleType),
 	}
+
+	recordCreateValues := clienttest.NewRecordValues(clienttest.NewRecordValueSimple(t, datatypes.StringType))
 
 	expectedCreateCall := NewExpectedModelCreateCall(datasetID, modelID, modelCreate)
 	expectedPropsCreateCall := NewExpectedPropertiesCreateCall(datasetID, modelID, propertiesCreate)
+	expectedRecordCreateCall := NewExpectedRecordCreateCall(datasetID, modelID, recordCreateValues)
 
-	mockServer := NewMockModelServer(t, expectedCreateCall, expectedPropsCreateCall)
+	mockServer := NewMockModelServer(t,
+		expectedCreateCall,
+		expectedPropsCreateCall,
+		expectedRecordCreateCall)
 	defer mockServer.Close()
 
 	processor := NewTestProcessorBuilder().WithInputDirectory("testdata/input").Build(t, mockServer.URL())
 
+	createdRecordExternalID := clienttest.NewExternalInstanceID()
 	require.NoError(t, processor.ProcessModelChanges(datasetID,
 		clientmodels.ModelChanges{
 			Create: &clientmodels.ModelPropsCreate{
 				Model:      modelCreate,
 				Properties: propertiesCreate,
 			},
+			Records: clientmodels.RecordChanges{
+				DeleteAll: false,
+				Create: []clientmodels.RecordCreate{{
+					ExternalID:   createdRecordExternalID,
+					RecordValues: recordCreateValues,
+				}},
+			},
 		}))
 	mockServer.AssertAllCalledExactlyOnce(t)
 
-	assert.Contains(t, processor.IDStore.ModelByName, modelCreate.Name)
-	assert.Equal(t, modelID, processor.IDStore.ModelByName[modelCreate.Name])
+	idStore := processor.IDStore
+	assert.Contains(t, idStore.ModelByName, modelCreate.Name)
+	assert.Equal(t, clientmodels.PennsieveSchemaID(modelID), idStore.ModelByName[modelCreate.Name])
+
+	assert.Contains(t, idStore.RecordIDByExternalID, createdRecordExternalID)
+	assert.Equal(t, clientmodels.PennsieveInstanceID(expectedRecordCreateCall.APIResponse.ID), idStore.RecordIDByExternalID[createdRecordExternalID])
+}
+
+func createRecordModelExists(t *testing.T) {
+	datasetID := newDatasetID()
+	modelID := uuid.NewString()
+	externalRecordID := clienttest.NewExternalInstanceID()
+
+	recordCreateValues := clienttest.NewRecordValues(clienttest.NewRecordValueSimple(t, datatypes.DoubleType))
+	expectedRecordCreateCall := NewExpectedRecordCreateCall(datasetID, modelID, recordCreateValues)
+
+	mockServer := NewMockModelServer(t, expectedRecordCreateCall)
+	defer mockServer.Close()
+
+	processor := NewTestProcessorBuilder().WithInputDirectory("testdata/input").Build(t, mockServer.URL())
+
+	require.NoError(t, processor.ProcessModelChanges(datasetID, clientmodels.ModelChanges{
+		ID: modelID,
+		Records: clientmodels.RecordChanges{
+			Create: []clientmodels.RecordCreate{
+				{
+					ExternalID:   externalRecordID,
+					RecordValues: recordCreateValues,
+				},
+			},
+		},
+	}))
+
+	mockServer.AssertAllCalledExactlyOnce(t)
+
+	idStore := processor.IDStore
+	// We didn't create a model, so nothing should be in here
+	assert.Empty(t, idStore.ModelByName)
+
+	assert.Contains(t, idStore.RecordIDByExternalID, externalRecordID)
+	assert.Equal(t,
+		clientmodels.PennsieveInstanceID(expectedRecordCreateCall.APIResponse.ID),
+		idStore.RecordIDByExternalID[externalRecordID])
 }

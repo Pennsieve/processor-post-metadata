@@ -28,24 +28,24 @@ type ExpectedAPICall[IN, OUT any] struct {
 	callCount           int
 }
 
-func NewExpectedModelCreateCall(expectedDatasetID string, modelID clientmodels.PennsieveInstanceID, expectedCreate clientmodels.ModelCreate) *ExpectedAPICall[clientmodels.ModelCreate, models.APIResponse] {
+func NewExpectedModelCreateCall(expectedDatasetID string, modelID string, expectedCreate clientmodels.ModelCreate) *ExpectedAPICall[clientmodels.ModelCreate, models.APIResponse] {
 	return &ExpectedAPICall[clientmodels.ModelCreate, models.APIResponse]{
 		Method:              http.MethodPost,
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts", expectedDatasetID),
 		ExpectedRequestBody: &expectedCreate,
 		APIResponse: models.APIResponse{
 			Name: expectedCreate.Name,
-			ID:   clientmodels.PennsieveInstanceID(modelID),
+			ID:   modelID,
 		},
 	}
 }
 
-func NewExpectedPropertiesCreateCall(expectedDatasetID string, modelID clientmodels.PennsieveInstanceID, expectedCreate clientmodels.PropertiesCreate) *ExpectedAPICall[clientmodels.PropertiesCreate, []models.APIResponse] {
+func NewExpectedPropertiesCreateCall(expectedDatasetID string, modelID string, expectedCreate clientmodels.PropertiesCreate) *ExpectedAPICall[clientmodels.PropertiesCreate, []models.APIResponse] {
 	var apiResponse []models.APIResponse
 	for _, prop := range expectedCreate {
 		apiResponse = append(apiResponse, models.APIResponse{
 			Name: prop.Name,
-			ID:   clientmodels.PennsieveInstanceID(uuid.NewString()),
+			ID:   uuid.NewString(),
 		})
 	}
 	return &ExpectedAPICall[clientmodels.PropertiesCreate, []models.APIResponse]{
@@ -53,6 +53,18 @@ func NewExpectedPropertiesCreateCall(expectedDatasetID string, modelID clientmod
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/properties", expectedDatasetID, modelID),
 		ExpectedRequestBody: &expectedCreate,
 		APIResponse:         apiResponse,
+	}
+}
+
+func NewExpectedRecordCreateCall(datasetID string, modelID string, expectedCreate clientmodels.RecordValues) *ExpectedAPICall[clientmodels.RecordValues, models.APIResponse] {
+	return &ExpectedAPICall[clientmodels.RecordValues, models.APIResponse]{
+		Method:              http.MethodPost,
+		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/instances", datasetID, modelID),
+		ExpectedRequestBody: &expectedCreate,
+		APIResponse: models.APIResponse{
+			Name: "",
+			ID:   uuid.NewString(),
+		},
 	}
 }
 

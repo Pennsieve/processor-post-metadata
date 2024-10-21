@@ -5,7 +5,12 @@ import (
 	"fmt"
 )
 
-// PennsieveInstanceID is the internal ID of the record in Pennsieve. Not usually seen by user, but needed for API calls
+// PennsieveSchemaID is the internal ID of a model or other schema object in Pennsieve.
+// Not usually seen by user, but needed for API calls
+type PennsieveSchemaID string
+
+// PennsieveInstanceID is the internal ID of the record or other instance in Pennsieve.
+// Not usually seen by user, but needed for API calls
 type PennsieveInstanceID string
 
 // ExternalInstanceID is an ID that the user supplies, or we can calculate from the values a user supplies. It identifies
@@ -72,8 +77,14 @@ type RecordChanges struct {
 	Update []RecordUpdate `json:"update"`
 }
 
-// RecordCreate can be used as a payload for POST /models/datasets/<dataset id>/concepts/<model id>/instances
-type RecordCreate RecordValues
+// RecordCreate wraps a RecordValues that can be used as a payload for
+// POST /models/datasets/<dataset id>/concepts/<model id>/instances to create a new record.
+// The ExternalID is not part of the payload, but is a non-pennsieve identifier for the record that
+// can be used to map this record to the eventual PennsieveInstanceID needed for links or package proxies
+type RecordCreate struct {
+	ExternalID ExternalInstanceID `json:"external_id"`
+	RecordValues
+}
 
 type RecordValue struct {
 	Value any    `json:"value"`
