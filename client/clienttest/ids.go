@@ -8,3 +8,7 @@ import (
 func NewExternalInstanceID() models.ExternalInstanceID {
 	return models.ExternalInstanceID(uuid.NewString())
 }
+
+func NewPennsieveInstanceID() models.PennsieveInstanceID {
+	return models.PennsieveInstanceID(uuid.NewString())
+}

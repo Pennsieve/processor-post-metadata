@@ -14,6 +14,7 @@ func TestMetadataPostProcessor_ProcessModelChanges(t *testing.T) {
 	for scenario, testFunc := range map[string]func(t *testing.T){
 		"create model and record":             createModel,
 		"create record; model already exists": createRecordModelExists,
+		"update record":                       updateRecord,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			testFunc(t)
@@ -106,4 +107,40 @@ func createRecordModelExists(t *testing.T) {
 	assert.Equal(t,
 		clientmodels.PennsieveInstanceID(expectedRecordCreateCall.APIResponse.ID),
 		idStore.RecordIDByExternalID[externalRecordID])
+}
+
+func updateRecord(t *testing.T) {
+	datasetID := newDatasetID()
+	modelID := uuid.NewString()
+
+	recordID := clienttest.NewPennsieveInstanceID()
+
+	recordUpdateValues := clienttest.NewRecordValues(
+		clienttest.NewRecordValueSimple(t, datatypes.DoubleType),
+		clienttest.NewRecordValueSimple(t, datatypes.StringType),
+	)
+	expectedRecordUpdateCall := NewExpectedRecordUpdateCall(datasetID, modelID, recordID, recordUpdateValues)
+
+	mockServer := NewMockModelServer(t, expectedRecordUpdateCall)
+	defer mockServer.Close()
+
+	processor := NewTestProcessorBuilder().WithInputDirectory("testdata/input").Build(t, mockServer.URL())
+
+	require.NoError(t, processor.ProcessModelChanges(datasetID, clientmodels.ModelChanges{
+		ID: modelID,
+		Records: clientmodels.RecordChanges{
+			Update: []clientmodels.RecordUpdate{
+				{
+					PennsieveID:  recordID,
+					RecordValues: recordUpdateValues,
+				},
+			},
+		},
+	}))
+
+	mockServer.AssertAllCalledExactlyOnce(t)
+
+	idStore := processor.IDStore
+	// We didn't create a model, so nothing should be in here
+	assert.Empty(t, idStore.ModelByName)
 }

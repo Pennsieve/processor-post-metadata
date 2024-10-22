@@ -62,7 +62,19 @@ func NewExpectedRecordCreateCall(datasetID string, modelID string, expectedCreat
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/instances", datasetID, modelID),
 		ExpectedRequestBody: &expectedCreate,
 		APIResponse: models.APIResponse{
-			Name: "",
+			Name: uuid.NewString(),
+			ID:   uuid.NewString(),
+		},
+	}
+}
+
+func NewExpectedRecordUpdateCall(datasetID string, modelID string, recordID clientmodels.PennsieveInstanceID, expectedUpdate clientmodels.RecordValues) *ExpectedAPICall[clientmodels.RecordValues, models.APIResponse] {
+	return &ExpectedAPICall[clientmodels.RecordValues, models.APIResponse]{
+		Method:              http.MethodPut,
+		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/instances/%s", datasetID, modelID, recordID),
+		ExpectedRequestBody: &expectedUpdate,
+		APIResponse: models.APIResponse{
+			Name: uuid.NewString(),
 			ID:   uuid.NewString(),
 		},
 	}

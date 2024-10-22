@@ -57,9 +57,9 @@ func NewRecordValueSimple(t require.TestingT, dataType datatypes.SimpleType) mod
 	case datatypes.BooleanType:
 		value = rand.Intn(2) == 0
 	case datatypes.LongType:
-		value = rand.Int63()
+		require.FailNow(t, "case not implemented", "cannot use %s", dataType)
 	case datatypes.DateType:
-		require.FailNow(t, "case not implemented", dataType)
+		require.FailNow(t, "case not implemented", "cannot use %s", dataType)
 	default:
 		require.FailNow(t, "unknown datatype", dataType)
 
