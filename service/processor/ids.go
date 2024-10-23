@@ -19,18 +19,36 @@ type IDStore struct {
 	RecordIDbyKey RecordIDLookup
 }
 
-func NewIDStore(existingSchema *metadataclient.Schema) *IDStore {
-	existingModelMap := existingSchema.ModelIDsByName()
-	byName := make(map[string]clientmodels.PennsieveSchemaID, len(existingModelMap))
+type IDStoreBuilder struct {
+	store *IDStore
+}
 
-	for name, id := range existingModelMap {
-		pennsieveID := clientmodels.PennsieveSchemaID(id)
-		byName[name] = pennsieveID
-	}
-	return &IDStore{
-		ModelByName:   byName,
+func NewIDStoreBuilder() *IDStoreBuilder {
+	return &IDStoreBuilder{store: &IDStore{
+		ModelByName:   make(map[string]clientmodels.PennsieveSchemaID),
 		RecordIDbyKey: make(RecordIDLookup),
+	}}
+}
+
+func (b *IDStoreBuilder) WithSchema(schema *metadataclient.Schema) *IDStoreBuilder {
+	for name, id := range schema.ModelIDsByName() {
+		b.store.ModelByName[name] = clientmodels.PennsieveSchemaID(id)
 	}
+	return b
+}
+
+func (b *IDStoreBuilder) WithModel(name string, id clientmodels.PennsieveSchemaID) *IDStoreBuilder {
+	b.store.AddModel(name, id)
+	return b
+}
+
+func (b *IDStoreBuilder) WithRecord(modelID clientmodels.PennsieveSchemaID, externalID clientmodels.ExternalInstanceID, recordID clientmodels.PennsieveInstanceID) *IDStoreBuilder {
+	b.store.AddRecord(modelID, externalID, recordID)
+	return b
+}
+
+func (b *IDStoreBuilder) Build() *IDStore {
+	return b.store
 }
 
 func (s *IDStore) AddModel(name string, id clientmodels.PennsieveSchemaID) {

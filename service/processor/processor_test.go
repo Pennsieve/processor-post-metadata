@@ -1,10 +1,12 @@
-package processor
+package processor_test
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/pennsieve/processor-post-metadata/service/models"
+	"github.com/pennsieve/processor-post-metadata/service/processor"
+	"github.com/pennsieve/processor-post-metadata/service/processor/internal/processortest"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -18,22 +20,14 @@ func TestCurationExportSyncProcessor_Run(t *testing.T) {
 	outputDirectory := "testdata/output"
 	sessionToken := uuid.NewString()
 
-	datasetID := newDatasetID()
+	datasetID := processortest.NewDatasetID()
 	mockServer := newMockServer(t, integrationID, datasetID)
 	defer mockServer.Close()
 
-	processor, err := NewMetadataPostProcessor(integrationID, inputDirectory, outputDirectory, sessionToken, mockServer.URL, mockServer.URL)
+	testProcessor, err := processor.NewMetadataPostProcessor(integrationID, inputDirectory, outputDirectory, sessionToken, mockServer.URL, mockServer.URL, nil)
 	require.NoError(t, err)
 
-	require.NoError(t, processor.Run())
-}
-
-func newDatasetID() string {
-	return newDatasetIDWithUUID(uuid.NewString())
-}
-
-func newDatasetIDWithUUID(datasetUUID string) string {
-	return fmt.Sprintf("N:dataset:%s", datasetUUID)
+	require.NoError(t, testProcessor.Run())
 }
 
 func newMockServer(t *testing.T, integrationID string, datasetID string) *httptest.Server {

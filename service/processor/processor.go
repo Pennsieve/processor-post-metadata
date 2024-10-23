@@ -7,7 +7,6 @@ import (
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
 	"github.com/pennsieve/processor-post-metadata/service/logging"
 	"github.com/pennsieve/processor-post-metadata/service/pennsieve"
-	metadataclient "github.com/pennsieve/processor-pre-metadata/client"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -19,7 +18,6 @@ type MetadataPostProcessor struct {
 	IntegrationID   string
 	InputDirectory  string
 	OutputDirectory string
-	MetadataReader  *metadataclient.Reader
 	Pennsieve       *pennsieve.Session
 	IDStore         *IDStore
 }
@@ -30,19 +28,15 @@ func NewMetadataPostProcessor(
 	outputDirectory string,
 	sessionToken string,
 	apiHost string,
-	api2Host string) (*MetadataPostProcessor, error) {
-	reader, err := metadataclient.NewReader(inputDirectory)
-	if err != nil {
-		return nil, fmt.Errorf("error creating metadata reader for %s: %w", inputDirectory, err)
-	}
+	api2Host string,
+	idStore *IDStore) (*MetadataPostProcessor, error) {
 	session := pennsieve.NewSession(sessionToken, apiHost, api2Host)
 	return &MetadataPostProcessor{
 		IntegrationID:   integrationID,
 		InputDirectory:  inputDirectory,
 		OutputDirectory: outputDirectory,
 		Pennsieve:       session,
-		MetadataReader:  reader,
-		IDStore:         NewIDStore(reader.Schema),
+		IDStore:         idStore,
 	}, nil
 }
 
@@ -59,6 +53,9 @@ func (p *MetadataPostProcessor) Run() error {
 	}
 	logger.Info("read dataset changeset file", slog.String("path", p.changesetFilePath()))
 	if err := p.ProcessModels(datasetID, datasetChanges.Models); err != nil {
+		return err
+	}
+	if err := p.ProcessLinks(datasetID, datasetChanges.LinkedProperties); err != nil {
 		return err
 	}
 	logger.Info("finished metadata processing")

@@ -23,7 +23,7 @@ func (p *MetadataPostProcessor) ProcessLinks(datasetID string, linkChanges []cli
 }
 
 func (p *MetadataPostProcessor) ProcessLinkChanges(datasetID string, linkChange clientmodels.LinkedPropertyChanges) error {
-	schemaIDs, err := p.CreateLinkIfNecessary(datasetID, linkChange)
+	schemaIDs, err := p.CreateLinkSchemaIfNecessary(datasetID, linkChange)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ type SchemaID struct {
 	ToModel   clientmodels.PennsieveSchemaID
 }
 
-func (p *MetadataPostProcessor) CreateLinkIfNecessary(datasetID string, linkChange clientmodels.LinkedPropertyChanges) (SchemaID, error) {
+func (p *MetadataPostProcessor) CreateLinkSchemaIfNecessary(datasetID string, linkChange clientmodels.LinkedPropertyChanges) (SchemaID, error) {
 	fromModelID, foundFrom := p.IDStore.ModelByName[linkChange.FromModelName]
 	if !foundFrom {
 		return SchemaID{}, fmt.Errorf("from model id for name %s not found", linkChange.FromModelName)

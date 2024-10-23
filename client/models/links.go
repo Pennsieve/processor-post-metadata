@@ -15,7 +15,7 @@ type LinkedPropertyChanges struct {
 
 	// The ID of the LinkedProperty in the schema. Can be empty or missing if the linkedProperty does not exist.
 	// In this case, Create below should be non-nil
-	ID string `json:"id,omitempty"`
+	ID PennsieveSchemaID `json:"id,omitempty"`
 
 	// If Create is non-nil, the link schema should be created in the model schema
 	Create *SchemaLinkedPropertyCreate `json:"create,omitempty"`

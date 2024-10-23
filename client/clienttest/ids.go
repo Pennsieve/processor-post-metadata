@@ -12,3 +12,7 @@ func NewExternalInstanceID() models.ExternalInstanceID {
 func NewPennsieveInstanceID() models.PennsieveInstanceID {
 	return models.PennsieveInstanceID(uuid.NewString())
 }
+
+func NewPennsieveSchemaID() models.PennsieveSchemaID {
+	return models.PennsieveSchemaID(uuid.NewString())
+}
