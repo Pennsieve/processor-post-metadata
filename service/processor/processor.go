@@ -42,7 +42,7 @@ func NewMetadataPostProcessor(
 		OutputDirectory: outputDirectory,
 		Pennsieve:       session,
 		MetadataReader:  reader,
-		IDStore:         NewIDStore(),
+		IDStore:         NewIDStore(reader.Schema),
 	}, nil
 }
 

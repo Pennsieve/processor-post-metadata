@@ -7,7 +7,7 @@ replace github.com/pennsieve/processor-post-metadata/client => ./../client
 require (
 	github.com/google/uuid v1.6.0
 	github.com/pennsieve/processor-post-metadata/client v0.0.0-00010101000000-000000000000
-	github.com/pennsieve/processor-pre-metadata/client v0.0.0
+	github.com/pennsieve/processor-pre-metadata/client v0.0.1-0.20241022200351-e38914034b3d
 	github.com/stretchr/testify v1.9.0
 )
 

@@ -1,0 +1,17 @@
+[
+  {
+    "count": 0,
+    "createdAt": "2024-10-01T18:49:49.930000+00:00",
+    "createdBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42",
+    "description": "",
+    "displayName": "Contributor",
+    "id": "d77470bb-f39d-49ee-aa17-783e128cdfa0",
+    "locked": false,
+    "name": "contributor",
+    "propertyCount": 6,
+    "templateId": null,
+    "type": "concept",
+    "updatedAt": "2024-10-01T18:49:49.930000+00:00",
+    "updatedBy": "N:user:a6f827dc-46e0-487c-9e19-ffe7dda54b42"
+  }
+]

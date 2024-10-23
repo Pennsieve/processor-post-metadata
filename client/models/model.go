@@ -67,8 +67,6 @@ func (pc *PropertyCreate) SetDataType(dataType any) error {
 }
 
 type RecordChanges struct {
-	// If DeleteAll is true, delete all records for the model. Model.ID should be non-empty in this case.
-	DeleteAll bool `json:"delete_all"`
 	// A list of RecordIDs to delete
 	Delete []PennsieveInstanceID `json:"delete"`
 	// Create are records that should be created

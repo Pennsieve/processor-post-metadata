@@ -45,7 +45,7 @@ func createModel(t *testing.T) {
 		expectedRecordCreateCall)
 	defer mockServer.Close()
 
-	processor := NewTestProcessorBuilder().WithInputDirectory("testdata/input").Build(t, mockServer.URL())
+	processor := NewTestProcessorBuilder().WithInputDirectory("testdata/input_no_model").Build(t, mockServer.URL())
 
 	createdRecordExternalID := clienttest.NewExternalInstanceID()
 	require.NoError(t, processor.ProcessModelChanges(datasetID,
@@ -55,7 +55,6 @@ func createModel(t *testing.T) {
 				Properties: propertiesCreate,
 			},
 			Records: clientmodels.RecordChanges{
-				DeleteAll: false,
 				Create: []clientmodels.RecordCreate{{
 					ExternalID:   createdRecordExternalID,
 					RecordValues: recordCreateValues,
@@ -66,10 +65,15 @@ func createModel(t *testing.T) {
 
 	idStore := processor.IDStore
 	assert.Contains(t, idStore.ModelByName, modelCreate.Name)
-	assert.Equal(t, clientmodels.PennsieveSchemaID(modelID), idStore.ModelByName[modelCreate.Name])
+	pennsieveModelID := clientmodels.PennsieveSchemaID(modelID)
+	assert.Equal(t, pennsieveModelID, idStore.ModelByName[modelCreate.Name])
 
-	assert.Contains(t, idStore.RecordIDByExternalID, createdRecordExternalID)
-	assert.Equal(t, clientmodels.PennsieveInstanceID(expectedRecordCreateCall.APIResponse.ID), idStore.RecordIDByExternalID[createdRecordExternalID])
+	recordKey := RecordIDKey{
+		ModelID:    pennsieveModelID,
+		ExternalID: createdRecordExternalID,
+	}
+	assert.Contains(t, idStore.RecordIDbyKey, recordKey)
+	assert.Equal(t, clientmodels.PennsieveInstanceID(expectedRecordCreateCall.APIResponse.ID), idStore.RecordIDbyKey[recordKey])
 }
 
 func createRecordModelExists(t *testing.T) {
@@ -83,7 +87,7 @@ func createRecordModelExists(t *testing.T) {
 	mockServer := NewMockModelServer(t, expectedRecordCreateCall)
 	defer mockServer.Close()
 
-	processor := NewTestProcessorBuilder().WithInputDirectory("testdata/input").Build(t, mockServer.URL())
+	processor := NewTestProcessorBuilder().WithInputDirectory("testdata/input_no_records").Build(t, mockServer.URL())
 
 	require.NoError(t, processor.ProcessModelChanges(datasetID, clientmodels.ModelChanges{
 		ID: modelID,
@@ -100,13 +104,15 @@ func createRecordModelExists(t *testing.T) {
 	mockServer.AssertAllCalledExactlyOnce(t)
 
 	idStore := processor.IDStore
-	// We didn't create a model, so nothing should be in here
-	assert.Empty(t, idStore.ModelByName)
 
-	assert.Contains(t, idStore.RecordIDByExternalID, externalRecordID)
+	recordKey := RecordIDKey{
+		ModelID:    clientmodels.PennsieveSchemaID(modelID),
+		ExternalID: externalRecordID,
+	}
+	assert.Contains(t, idStore.RecordIDbyKey, recordKey)
 	assert.Equal(t,
 		clientmodels.PennsieveInstanceID(expectedRecordCreateCall.APIResponse.ID),
-		idStore.RecordIDByExternalID[externalRecordID])
+		idStore.RecordIDbyKey[recordKey])
 }
 
 func updateRecord(t *testing.T) {
@@ -140,7 +146,4 @@ func updateRecord(t *testing.T) {
 
 	mockServer.AssertAllCalledExactlyOnce(t)
 
-	idStore := processor.IDStore
-	// We didn't create a model, so nothing should be in here
-	assert.Empty(t, idStore.ModelByName)
 }

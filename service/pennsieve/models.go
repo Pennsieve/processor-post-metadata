@@ -2,6 +2,7 @@ package pennsieve
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
 	"github.com/pennsieve/processor-post-metadata/service/models"
@@ -73,6 +74,45 @@ func (s *Session) UpdateRecord(datasetID string, modelID clientmodels.PennsieveS
 		return "", fmt.Errorf("error decoding update record %s response for model %s: %w", recordID, modelID, err)
 	}
 	return clientmodels.PennsieveInstanceID(apiResponse.Name), nil
+}
+
+type bulkDeleteResponse struct {
+	Success []clientmodels.PennsieveInstanceID `json:"success"`
+	// Errors is a slice of slices. Each slice in the outer slice should be of the form [instance-id, error-message]
+	Errors [][]string `json:"errors"`
+}
+
+func (s *Session) DeleteRecords(datasetID string, modelID clientmodels.PennsieveSchemaID, recordIDs []clientmodels.PennsieveInstanceID) error {
+	url := fmt.Sprintf("%s/models/datasets/%s/concepts/%s/instances", s.APIHost, datasetID, modelID)
+	response, err := s.InvokePennsieve(http.MethodDelete, url, recordIDs)
+	if err != nil {
+		return fmt.Errorf("error deleting %d records for model %s: %w", len(recordIDs), modelID, err)
+	}
+
+	defer util.CloseAndWarn(response)
+
+	var bulkResponse bulkDeleteResponse
+	if err := json.NewDecoder(response.Body).Decode(&bulkResponse); err != nil {
+		return fmt.Errorf("error decoding response from deleting %d records for model %s: %w", len(recordIDs), modelID, err)
+	}
+
+	if len(bulkResponse.Errors) == 0 {
+		return nil
+	}
+
+	var errs []error
+	errs = append(errs, fmt.Errorf("errors deleting %d of %d records for model %s",
+		len(bulkResponse.Errors),
+		len(recordIDs),
+		modelID))
+
+	for _, errResp := range bulkResponse.Errors {
+		errs = append(errs, fmt.Errorf("error deleting record %s: %s",
+			errResp[0],
+			errResp[1],
+		))
+	}
+	return errors.Join(errs...)
 }
 
 func handleResponseBody(response *http.Response) (models.APIResponse, error) {

@@ -27,13 +27,13 @@ func (p *MetadataPostProcessor) ProcessModelChanges(datasetID string, modelChang
 		return err
 	}
 	modelLogger := logger.With(slog.Any("modelID", modelID))
-	modelLogger.Info("creating models")
+	modelLogger.Info("creating records")
 	for _, recordCreate := range modelChanges.Records.Create {
 		if err := p.CreateRecord(datasetID, modelID, recordCreate); err != nil {
 			return err
 		}
 	}
-	modelLogger.Info("created models", slog.Int("count", len(modelChanges.Records.Create)))
+	modelLogger.Info("created records", slog.Int("count", len(modelChanges.Records.Create)))
 	modelLogger.Info("updating records")
 	for _, recordUpdate := range modelChanges.Records.Update {
 		if err := p.UpdateRecord(datasetID, modelID, recordUpdate); err != nil {
@@ -41,6 +41,8 @@ func (p *MetadataPostProcessor) ProcessModelChanges(datasetID string, modelChang
 		}
 	}
 	modelLogger.Info("updated models", slog.Int("count", len(modelChanges.Records.Update)))
+	// TODO handle deletes. I think the link and proxy deletes need to happen first
+
 	return nil
 }
 
@@ -66,13 +68,20 @@ func (p *MetadataPostProcessor) CreateRecord(datasetID string, modelID clientmod
 	if err != nil {
 		return err
 	}
-	p.IDStore.AddRecord(recordCreate.ExternalID, recordID)
+	p.IDStore.AddRecord(modelID, recordCreate.ExternalID, recordID)
 	return nil
 }
 
 func (p *MetadataPostProcessor) UpdateRecord(datasetID string, modelID clientmodels.PennsieveSchemaID, recordUpdate clientmodels.RecordUpdate) error {
 	_, err := p.Pennsieve.UpdateRecord(datasetID, modelID, recordUpdate.PennsieveID, recordUpdate.RecordValues)
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *MetadataPostProcessor) DeleteRecords(datasetID string, modelID clientmodels.PennsieveSchemaID, recordIDs []clientmodels.PennsieveInstanceID) error {
+	if err := p.Pennsieve.DeleteRecords(datasetID, modelID, recordIDs); err != nil {
 		return err
 	}
 	return nil
