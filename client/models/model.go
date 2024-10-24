@@ -9,6 +9,10 @@ import (
 // Not usually seen by user, but needed for API calls
 type PennsieveSchemaID string
 
+func (i PennsieveSchemaID) String() string {
+	return string(i)
+}
+
 // PennsieveInstanceID is the internal ID of the record or other instance in Pennsieve.
 // Not usually seen by user, but needed for API calls
 type PennsieveInstanceID string
@@ -20,7 +24,7 @@ type ExternalInstanceID string
 type ModelChanges struct {
 	// The ID of the model. Can be empty or missing if the model does not exist.
 	// In this case, Create below should be non-nil
-	ID string `json:"id,omitempty"`
+	ID PennsieveSchemaID `json:"id,omitempty"`
 	// If Create is non-nil, the model should be created
 	Create *ModelPropsCreate `json:"create,omitempty"`
 	// Records describes the changes to the records of this model type

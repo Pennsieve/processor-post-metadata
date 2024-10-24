@@ -6,6 +6,33 @@ import (
 	"log/slog"
 )
 
+func (p *MetadataPostProcessor) ProcessRecordDeletes(datasetID string, modelChanges []clientmodels.ModelChanges) error {
+	if len(modelChanges) == 0 {
+		logger.Info("no record deletes")
+		return nil
+	}
+	for _, modelChange := range modelChanges {
+		if err := p.ProcessModelChangeRecordDeletes(datasetID, modelChange); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *MetadataPostProcessor) ProcessModelChangeRecordDeletes(datasetID string, change clientmodels.ModelChanges) error {
+	modelLogger := logger.With(slog.Any("modelID", change.ID))
+	if len(change.Records.Delete) == 0 {
+		modelLogger.Info("no deletes")
+		return nil
+	}
+	modelLogger.Info("starting record deletes")
+	if err := p.Pennsieve.DeleteRecords(datasetID, change.ID, change.Records.Delete); err != nil {
+		return err
+	}
+	modelLogger.Info("finished record deletes", slog.Int("count", len(change.Records.Delete)))
+	return nil
+}
+
 func (p *MetadataPostProcessor) ProcessModels(datasetID string, modelChanges []clientmodels.ModelChanges) error {
 	if len(modelChanges) == 0 {
 		logger.Info("no model changes")
@@ -41,14 +68,13 @@ func (p *MetadataPostProcessor) ProcessModelChanges(datasetID string, modelChang
 		}
 	}
 	modelLogger.Info("updated models", slog.Int("count", len(modelChanges.Records.Update)))
-	// TODO handle deletes. I think the link and proxy deletes need to happen first
 
 	return nil
 }
 
 func (p *MetadataPostProcessor) CreateModelIfNecessary(datasetID string, modelChange clientmodels.ModelChanges) (clientmodels.PennsieveSchemaID, error) {
 	if modelChange.Create == nil {
-		logger.Info("model already exists", slog.String("modelID", modelChange.ID))
+		logger.Info("model already exists", slog.Any("modelID", modelChange.ID))
 		return clientmodels.PennsieveSchemaID(modelChange.ID), nil
 	}
 	modelCreate := modelChange.Create
@@ -75,13 +101,6 @@ func (p *MetadataPostProcessor) CreateRecord(datasetID string, modelID clientmod
 func (p *MetadataPostProcessor) UpdateRecord(datasetID string, modelID clientmodels.PennsieveSchemaID, recordUpdate clientmodels.RecordUpdate) error {
 	_, err := p.Pennsieve.UpdateRecord(datasetID, modelID, recordUpdate.PennsieveID, recordUpdate.RecordValues)
 	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *MetadataPostProcessor) DeleteRecords(datasetID string, modelID clientmodels.PennsieveSchemaID, recordIDs []clientmodels.PennsieveInstanceID) error {
-	if err := p.Pennsieve.DeleteRecords(datasetID, modelID, recordIDs); err != nil {
 		return err
 	}
 	return nil

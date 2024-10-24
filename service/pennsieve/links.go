@@ -29,3 +29,12 @@ func (s *Session) CreateLinkedPropertyInstance(datasetID string, fromModelID cli
 	}
 	return nil
 }
+
+func (s *Session) DeleteLinkedPropertyInstance(datasetID string, fromModelID clientmodels.PennsieveSchemaID, linkDelete clientmodels.InstanceLinkedPropertyDelete) error {
+	url := fmt.Sprintf("%s/models/datasets/%s/concepts/%s/instances/%s/linked/%s", s.APIHost, datasetID, fromModelID, linkDelete.FromRecordID, linkDelete.InstanceLinkedPropertyID)
+	_, err := s.InvokePennsieve(http.MethodDelete, url, nil)
+	if err != nil {
+		return fmt.Errorf("error deleting linked property instance %s: %w", linkDelete.InstanceLinkedPropertyID, err)
+	}
+	return nil
+}

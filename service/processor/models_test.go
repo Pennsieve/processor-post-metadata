@@ -27,7 +27,7 @@ func TestMetadataPostProcessor_ProcessModelChanges(t *testing.T) {
 
 func createModel(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
-	modelID := uuid.NewString()
+	modelID := clienttest.NewPennsieveSchemaID()
 
 	modelCreate := clienttest.NewModelCreate()
 
@@ -68,11 +68,10 @@ func createModel(t *testing.T) {
 
 	idStore := testProcessor.IDStore
 	assert.Contains(t, idStore.ModelByName, modelCreate.Name)
-	pennsieveModelID := clientmodels.PennsieveSchemaID(modelID)
-	assert.Equal(t, pennsieveModelID, idStore.ModelByName[modelCreate.Name])
+	assert.Equal(t, modelID, idStore.ModelByName[modelCreate.Name])
 
 	recordKey := processor.RecordIDKey{
-		ModelID:    pennsieveModelID,
+		ModelID:    modelID,
 		ExternalID: createdRecordExternalID,
 	}
 	assert.Contains(t, idStore.RecordIDbyKey, recordKey)
@@ -82,7 +81,7 @@ func createModel(t *testing.T) {
 func createRecordModelExists(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
 	modelName := uuid.NewString()
-	modelID := uuid.NewString()
+	modelID := clienttest.NewPennsieveSchemaID()
 	externalRecordID := clienttest.NewExternalInstanceID()
 
 	recordCreateValues := clienttest.NewRecordValues(clienttest.NewRecordValueSimple(t, datatypes.DoubleType))
@@ -92,7 +91,7 @@ func createRecordModelExists(t *testing.T) {
 	defer mockServer.Close()
 
 	testProcessor := processortest.NewBuilder().
-		WithIDStore(processor.NewIDStoreBuilder().WithModel(modelName, clientmodels.PennsieveSchemaID(modelID)).Build()).
+		WithIDStore(processor.NewIDStoreBuilder().WithModel(modelName, modelID).Build()).
 		Build(t, mockServer.URL())
 
 	require.NoError(t, testProcessor.ProcessModelChanges(datasetID, clientmodels.ModelChanges{
@@ -112,7 +111,7 @@ func createRecordModelExists(t *testing.T) {
 	idStore := testProcessor.IDStore
 
 	recordKey := processor.RecordIDKey{
-		ModelID:    clientmodels.PennsieveSchemaID(modelID),
+		ModelID:    modelID,
 		ExternalID: externalRecordID,
 	}
 	assert.Contains(t, idStore.RecordIDbyKey, recordKey)
@@ -123,7 +122,7 @@ func createRecordModelExists(t *testing.T) {
 
 func updateRecord(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
-	modelID := uuid.NewString()
+	modelID := clienttest.NewPennsieveSchemaID()
 
 	recordID := clienttest.NewPennsieveInstanceID()
 
@@ -137,7 +136,7 @@ func updateRecord(t *testing.T) {
 	defer mockServer.Close()
 
 	testProcessor := processortest.NewBuilder().
-		WithIDStore(processor.NewIDStoreBuilder().WithModel(uuid.NewString(), clientmodels.PennsieveSchemaID(modelID)).Build()).
+		WithIDStore(processor.NewIDStoreBuilder().WithModel(uuid.NewString(), modelID).Build()).
 		Build(t, mockServer.URL())
 
 	require.NoError(t, testProcessor.ProcessModelChanges(datasetID, clientmodels.ModelChanges{
@@ -154,4 +153,121 @@ func updateRecord(t *testing.T) {
 
 	mockServer.AssertAllCalledExactlyOnce(t)
 
+}
+
+func TestMetadataPostProcessor_ProcessModelChangeRecordDeletes(t *testing.T) {
+	for scenario, testFunc := range map[string]func(t *testing.T){
+		"no deletes, model does not exist": noDeletesModelDoesNotExist,
+		"no deletes, model exists":         noDeletesModelExists,
+		"one delete":                       oneDelete,
+		"several deletes":                  severalDeletes,
+		"failed deletes":                   failedDeletes,
+	} {
+		t.Run(scenario, func(t *testing.T) {
+			testFunc(t)
+		})
+	}
+}
+
+func noDeletesModelDoesNotExist(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+	mockServer := mock.NewModelService(t)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
+
+	modelCreate := clienttest.NewModelCreate()
+
+	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
+		Create: &clientmodels.ModelPropsCreate{
+			Model:      modelCreate,
+			Properties: clientmodels.PropertiesCreate{clienttest.NewPropertyCreateSimple(t, datatypes.DoubleType)},
+		},
+	}))
+}
+
+func noDeletesModelExists(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+	modelID := clienttest.NewPennsieveSchemaID()
+
+	mockServer := mock.NewModelService(t)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
+
+	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{ID: modelID}))
+}
+
+func oneDelete(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+	modelID := clienttest.NewPennsieveSchemaID()
+
+	toDelete := []clientmodels.PennsieveInstanceID{clienttest.NewPennsieveInstanceID()}
+
+	expectedDeleteCall := mock.NewExpectedRecordDeleteCall(datasetID, modelID, toDelete)
+
+	mockServer := mock.NewModelService(t, expectedDeleteCall)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
+
+	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
+		ID: modelID,
+		Records: clientmodels.RecordChanges{
+			Delete: toDelete,
+		},
+	}))
+
+	mockServer.AssertAllCalledExactlyOnce(t)
+}
+
+func severalDeletes(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+	modelID := clienttest.NewPennsieveSchemaID()
+
+	toDelete := []clientmodels.PennsieveInstanceID{clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID()}
+
+	expectedDeleteCall := mock.NewExpectedRecordDeleteCall(datasetID, modelID, toDelete)
+
+	mockServer := mock.NewModelService(t, expectedDeleteCall)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
+
+	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
+		ID: modelID,
+		Records: clientmodels.RecordChanges{
+			Delete: toDelete,
+		},
+	}))
+
+	mockServer.AssertAllCalledExactlyOnce(t)
+}
+
+func failedDeletes(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+	modelID := clienttest.NewPennsieveSchemaID()
+
+	toDelete := []clientmodels.PennsieveInstanceID{clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID()}
+
+	expectedDeleteCall := mock.NewExpectedRecordDeleteCallFailure(datasetID, modelID, toDelete)
+
+	mockServer := mock.NewModelService(t, expectedDeleteCall)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
+
+	err := testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
+		ID: modelID,
+		Records: clientmodels.RecordChanges{
+			Delete: toDelete,
+		},
+	})
+
+	require.Error(t, err)
+	for _, recordID := range toDelete {
+		assert.ErrorContains(t, err, string(recordID))
+	}
+
+	mockServer.AssertAllCalledExactlyOnce(t)
 }

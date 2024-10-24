@@ -76,12 +76,6 @@ func (s *Session) UpdateRecord(datasetID string, modelID clientmodels.PennsieveS
 	return clientmodels.PennsieveInstanceID(apiResponse.Name), nil
 }
 
-type bulkDeleteResponse struct {
-	Success []clientmodels.PennsieveInstanceID `json:"success"`
-	// Errors is a slice of slices. Each slice in the outer slice should be of the form [instance-id, error-message]
-	Errors [][]string `json:"errors"`
-}
-
 func (s *Session) DeleteRecords(datasetID string, modelID clientmodels.PennsieveSchemaID, recordIDs []clientmodels.PennsieveInstanceID) error {
 	url := fmt.Sprintf("%s/models/datasets/%s/concepts/%s/instances", s.APIHost, datasetID, modelID)
 	response, err := s.InvokePennsieve(http.MethodDelete, url, recordIDs)
@@ -91,7 +85,7 @@ func (s *Session) DeleteRecords(datasetID string, modelID clientmodels.Pennsieve
 
 	defer util.CloseAndWarn(response)
 
-	var bulkResponse bulkDeleteResponse
+	var bulkResponse models.BulkDeleteRecordsResponse
 	if err := json.NewDecoder(response.Body).Decode(&bulkResponse); err != nil {
 		return fmt.Errorf("error decoding response from deleting %d records for model %s: %w", len(recordIDs), modelID, err)
 	}

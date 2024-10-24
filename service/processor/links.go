@@ -7,6 +7,37 @@ import (
 	"log/slog"
 )
 
+func (p *MetadataPostProcessor) ProcessLinkInstanceDeletes(datasetID string, linkChanges []clientmodels.LinkedPropertyChanges) error {
+	if len(linkChanges) == 0 {
+		logger.Info("no link deletes")
+		return nil
+	}
+	for _, linkChange := range linkChanges {
+		if err := p.ProcessLinkChangesInstanceDeletes(datasetID, linkChange); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *MetadataPostProcessor) ProcessLinkChangesInstanceDeletes(datasetID string, linkChange clientmodels.LinkedPropertyChanges) error {
+	linkLogger := logger.With(slog.Any("linkSchemaID", linkChange.ID))
+	if len(linkChange.Instances.Delete) == 0 {
+		linkLogger.Info("no deletes")
+	}
+	linkLogger.Info("starting link deletes")
+	fromModelID, err := p.IDStore.ModelID(linkChange.FromModelName)
+	if err != nil {
+		return fmt.Errorf("unable to delete linked properties from model %s to model %s: %w", linkChange.FromModelName, linkChange.ToModelName, err)
+	}
+	for _, linkDelete := range linkChange.Instances.Delete {
+		if err := p.Pennsieve.DeleteLinkedPropertyInstance(datasetID, fromModelID, linkDelete); err != nil {
+			return err
+		}
+	}
+	linkLogger.Info("finished link deletes", slog.Int("count", len(linkChange.Instances.Delete)))
+	return nil
+}
 func (p *MetadataPostProcessor) ProcessLinks(datasetID string, linkChanges []clientmodels.LinkedPropertyChanges) error {
 	if len(linkChanges) == 0 {
 		logger.Info("no link changes")

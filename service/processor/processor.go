@@ -52,13 +52,34 @@ func (p *MetadataPostProcessor) Run() error {
 		return err
 	}
 	logger.Info("read dataset changeset file", slog.String("path", p.changesetFilePath()))
+	if err := p.ProcessDeletes(datasetID, datasetChanges); err != nil {
+		return err
+	}
 	if err := p.ProcessModels(datasetID, datasetChanges.Models); err != nil {
+		return err
+	}
+	// Wait til after ProcessModels to add these so that the IDStore now should have the complete mapping
+	// of model names to model IDs for any models that were created.
+	// ProcessLinks and ProcessProxies will need these record ID maps.
+	if err := p.IDStore.AddRecordIDMaps(datasetChanges.RecordIDMaps); err != nil {
 		return err
 	}
 	if err := p.ProcessLinks(datasetID, datasetChanges.LinkedProperties); err != nil {
 		return err
 	}
 	logger.Info("finished metadata processing")
+	return nil
+}
+
+func (p *MetadataPostProcessor) ProcessDeletes(datasetID string, datasetChanges clientmodels.Dataset) error {
+	// Delete dependent objects, links and proxies before deleting records
+	if err := p.ProcessLinkInstanceDeletes(datasetID, datasetChanges.LinkedProperties); err != nil {
+		return err
+	}
+	// TODO add in proxy deletes before record deletes
+	if err := p.ProcessRecordDeletes(datasetID, datasetChanges.Models); err != nil {
+		return err
+	}
 	return nil
 }
 

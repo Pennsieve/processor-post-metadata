@@ -19,6 +19,50 @@ type IDStore struct {
 	RecordIDbyKey RecordIDLookup
 }
 
+func (s *IDStore) AddModel(name string, id clientmodels.PennsieveSchemaID) {
+	s.ModelByName[name] = id
+}
+
+func (s *IDStore) AddRecord(modelID clientmodels.PennsieveSchemaID, externalID clientmodels.ExternalInstanceID, id clientmodels.PennsieveInstanceID) {
+	s.RecordIDbyKey[RecordIDKey{
+		ModelID:    modelID,
+		ExternalID: externalID,
+	}] = id
+}
+
+func (s *IDStore) AddRecordIDMaps(recordIDMaps []clientmodels.RecordIDMap) error {
+	for _, recordIDMap := range recordIDMaps {
+		modelID, err := s.ModelID(recordIDMap.ModelName)
+		if err != nil {
+			return fmt.Errorf("unable to add recordIDMap for model: %s: %w", recordIDMap.ModelName, err)
+		}
+		for external, pennsieve := range recordIDMap.ExternalToPennsieve {
+			s.AddRecord(modelID, external, pennsieve)
+		}
+
+	}
+	return nil
+}
+
+func (s *IDStore) RecordID(modelID clientmodels.PennsieveSchemaID, externalID clientmodels.ExternalInstanceID) (clientmodels.PennsieveInstanceID, error) {
+	recordID, found := s.RecordIDbyKey[RecordIDKey{
+		ModelID:    modelID,
+		ExternalID: externalID,
+	}]
+	if !found {
+		return "", fmt.Errorf("no record in model %s with external id %s", modelID, externalID)
+	}
+	return recordID, nil
+}
+
+func (s *IDStore) ModelID(modelName string) (clientmodels.PennsieveSchemaID, error) {
+	modelID, found := s.ModelByName[modelName]
+	if !found {
+		return "", fmt.Errorf("id for model %s not found", modelName)
+	}
+	return modelID, nil
+}
+
 type IDStoreBuilder struct {
 	store *IDStore
 }
@@ -49,26 +93,4 @@ func (b *IDStoreBuilder) WithRecord(modelID clientmodels.PennsieveSchemaID, exte
 
 func (b *IDStoreBuilder) Build() *IDStore {
 	return b.store
-}
-
-func (s *IDStore) AddModel(name string, id clientmodels.PennsieveSchemaID) {
-	s.ModelByName[name] = id
-}
-
-func (s *IDStore) AddRecord(modelID clientmodels.PennsieveSchemaID, externalID clientmodels.ExternalInstanceID, id clientmodels.PennsieveInstanceID) {
-	s.RecordIDbyKey[RecordIDKey{
-		ModelID:    modelID,
-		ExternalID: externalID,
-	}] = id
-}
-
-func (s *IDStore) RecordID(modelID clientmodels.PennsieveSchemaID, externalID clientmodels.ExternalInstanceID) (clientmodels.PennsieveInstanceID, error) {
-	recordID, found := s.RecordIDbyKey[RecordIDKey{
-		ModelID:    modelID,
-		ExternalID: externalID,
-	}]
-	if !found {
-		return "", fmt.Errorf("no record in model %s with external id %s", modelID, externalID)
-	}
-	return recordID, nil
 }

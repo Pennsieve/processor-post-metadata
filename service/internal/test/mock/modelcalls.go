@@ -3,32 +3,32 @@ package mock
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/pennsieve/processor-post-metadata/client/models"
-	models2 "github.com/pennsieve/processor-post-metadata/service/models"
+	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
+	"github.com/pennsieve/processor-post-metadata/service/models"
 	"net/http"
 )
 
-func NewExpectedModelCreateCall(expectedDatasetID string, modelID string, expectedCreate models.ModelCreate) *ExpectedAPICall[models.ModelCreate, models2.APIResponse] {
-	return &ExpectedAPICall[models.ModelCreate, models2.APIResponse]{
+func NewExpectedModelCreateCall(expectedDatasetID string, modelID clientmodels.PennsieveSchemaID, expectedCreate clientmodels.ModelCreate) *ExpectedAPICall[clientmodels.ModelCreate, models.APIResponse] {
+	return &ExpectedAPICall[clientmodels.ModelCreate, models.APIResponse]{
 		Method:              http.MethodPost,
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts", expectedDatasetID),
 		ExpectedRequestBody: &expectedCreate,
-		APIResponse: models2.APIResponse{
+		APIResponse: models.APIResponse{
 			Name: expectedCreate.Name,
-			ID:   modelID,
+			ID:   modelID.String(),
 		},
 	}
 }
 
-func NewExpectedPropertiesCreateCall(expectedDatasetID string, modelID string, expectedCreate models.PropertiesCreate) *ExpectedAPICall[models.PropertiesCreate, []models2.APIResponse] {
-	var apiResponse []models2.APIResponse
+func NewExpectedPropertiesCreateCall(expectedDatasetID string, modelID clientmodels.PennsieveSchemaID, expectedCreate clientmodels.PropertiesCreate) *ExpectedAPICall[clientmodels.PropertiesCreate, []models.APIResponse] {
+	var apiResponse []models.APIResponse
 	for _, prop := range expectedCreate {
-		apiResponse = append(apiResponse, models2.APIResponse{
+		apiResponse = append(apiResponse, models.APIResponse{
 			Name: prop.Name,
 			ID:   uuid.NewString(),
 		})
 	}
-	return &ExpectedAPICall[models.PropertiesCreate, []models2.APIResponse]{
+	return &ExpectedAPICall[clientmodels.PropertiesCreate, []models.APIResponse]{
 		Method:              http.MethodPut,
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/properties", expectedDatasetID, modelID),
 		ExpectedRequestBody: &expectedCreate,
@@ -36,26 +36,52 @@ func NewExpectedPropertiesCreateCall(expectedDatasetID string, modelID string, e
 	}
 }
 
-func NewExpectedRecordCreateCall(datasetID string, modelID string, expectedCreate models.RecordValues) *ExpectedAPICall[models.RecordValues, models2.APIResponse] {
-	return &ExpectedAPICall[models.RecordValues, models2.APIResponse]{
+func NewExpectedRecordCreateCall(datasetID string, modelID clientmodels.PennsieveSchemaID, expectedCreate clientmodels.RecordValues) *ExpectedAPICall[clientmodels.RecordValues, models.APIResponse] {
+	return &ExpectedAPICall[clientmodels.RecordValues, models.APIResponse]{
 		Method:              http.MethodPost,
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/instances", datasetID, modelID),
 		ExpectedRequestBody: &expectedCreate,
-		APIResponse: models2.APIResponse{
+		APIResponse: models.APIResponse{
 			Name: uuid.NewString(),
 			ID:   uuid.NewString(),
 		},
 	}
 }
 
-func NewExpectedRecordUpdateCall(datasetID string, modelID string, recordID models.PennsieveInstanceID, expectedUpdate models.RecordValues) *ExpectedAPICall[models.RecordValues, models2.APIResponse] {
-	return &ExpectedAPICall[models.RecordValues, models2.APIResponse]{
+func NewExpectedRecordUpdateCall(datasetID string, modelID clientmodels.PennsieveSchemaID, recordID clientmodels.PennsieveInstanceID, expectedUpdate clientmodels.RecordValues) *ExpectedAPICall[clientmodels.RecordValues, models.APIResponse] {
+	return &ExpectedAPICall[clientmodels.RecordValues, models.APIResponse]{
 		Method:              http.MethodPut,
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/instances/%s", datasetID, modelID, recordID),
 		ExpectedRequestBody: &expectedUpdate,
-		APIResponse: models2.APIResponse{
+		APIResponse: models.APIResponse{
 			Name: uuid.NewString(),
 			ID:   uuid.NewString(),
+		},
+	}
+}
+
+func NewExpectedRecordDeleteCall(datasetID string, modelID clientmodels.PennsieveSchemaID, expectedDelete []clientmodels.PennsieveInstanceID) *ExpectedAPICall[[]clientmodels.PennsieveInstanceID, models.BulkDeleteRecordsResponse] {
+	return &ExpectedAPICall[[]clientmodels.PennsieveInstanceID, models.BulkDeleteRecordsResponse]{
+		Method:              http.MethodDelete,
+		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/instances", datasetID, modelID),
+		ExpectedRequestBody: &expectedDelete,
+		APIResponse: models.BulkDeleteRecordsResponse{
+			Success: expectedDelete,
+		},
+	}
+}
+
+func NewExpectedRecordDeleteCallFailure(datasetID string, modelID clientmodels.PennsieveSchemaID, expectedDelete []clientmodels.PennsieveInstanceID) *ExpectedAPICall[[]clientmodels.PennsieveInstanceID, models.BulkDeleteRecordsResponse] {
+	var errs [][]string
+	for _, recordID := range expectedDelete {
+		errs = append(errs, []string{string(recordID), "could not delete record"})
+	}
+	return &ExpectedAPICall[[]clientmodels.PennsieveInstanceID, models.BulkDeleteRecordsResponse]{
+		Method:              http.MethodDelete,
+		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/instances", datasetID, modelID),
+		ExpectedRequestBody: &expectedDelete,
+		APIResponse: models.BulkDeleteRecordsResponse{
+			Errors: errs,
 		},
 	}
 }
