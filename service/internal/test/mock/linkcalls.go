@@ -30,3 +30,11 @@ func NewExpectedCreateLinkInstanceCall(datasetID string, fromModelID clientmodel
 		},
 	}
 }
+
+func NewExpectedDeleteLinkInstanceCall(datasetID string, modelID clientmodels.PennsieveSchemaID, fromRecordID clientmodels.PennsieveInstanceID, linkInstanceID clientmodels.PennsieveInstanceID) *ExpectedAPICall[any, any] {
+	return &ExpectedAPICall[any, any]{
+		Method: http.MethodDelete,
+		APIPath: fmt.Sprintf("/models/datasets/%s/concepts/%s/instances/%s/linked/%s",
+			datasetID, modelID, fromRecordID, linkInstanceID),
+	}
+}

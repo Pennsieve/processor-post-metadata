@@ -24,6 +24,7 @@ func (p *MetadataPostProcessor) ProcessLinkChangesInstanceDeletes(datasetID stri
 	linkLogger := logger.With(slog.Any("linkSchemaID", linkChange.ID))
 	if len(linkChange.Instances.Delete) == 0 {
 		linkLogger.Info("no deletes")
+		return nil
 	}
 	linkLogger.Info("starting link deletes")
 	fromModelID, err := p.IDStore.ModelID(linkChange.FromModelName)

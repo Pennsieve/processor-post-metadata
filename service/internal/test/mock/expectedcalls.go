@@ -38,8 +38,12 @@ func (e *ExpectedAPICall[I, _]) HandlerFunction(t *testing.T) func(http.Response
 		}
 		responseBytes, err := json.Marshal(e.APIResponse)
 		require.NoError(t, err)
-		_, err = writer.Write(responseBytes)
-		require.NoError(t, err)
+		// can't see if e.APIResponse is nil because of generics, so
+		// see if the marshal result was null instead
+		if string(responseBytes) != "null" && string(responseBytes) != `""` {
+			_, err = writer.Write(responseBytes)
+			require.NoError(t, err)
+		}
 	}
 }
 

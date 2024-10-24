@@ -118,3 +118,116 @@ func createLinkInstance(t *testing.T) {
 
 	mockServer.AssertAllCalledExactlyOnce(t)
 }
+
+func TestMetadataPostProcessor_ProcessLinkChangesInstanceDeletes(t *testing.T) {
+	for scenario, testFunc := range map[string]func(t *testing.T){
+		"no deletes, schema does not exist": noDeletesLinkSchemaDoesNotExist,
+		"no deletes, schema exists":         noDeletesLinkSchemaExists,
+		"deletes":                           deletes,
+	} {
+		t.Run(scenario, func(t *testing.T) {
+			testFunc(t)
+		})
+	}
+}
+
+func noDeletesLinkSchemaDoesNotExist(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+
+	fromModelName := uuid.NewString()
+	fromModelID := clienttest.NewPennsieveSchemaID()
+
+	initialIDStore := processor.NewIDStoreBuilder().
+		WithModel(fromModelName, fromModelID).
+		Build()
+
+	schemaCreate := clienttest.NewSchemaLinkedPropertyCreate()
+
+	mockServer := mock.NewModelService(t)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().WithIDStore(initialIDStore).Build(t, mockServer.URL())
+
+	require.NoError(t, testProcessor.ProcessLinkChangesInstanceDeletes(datasetID, clientmodels.LinkedPropertyChanges{
+		FromModelName: fromModelName,
+		ToModelName:   uuid.NewString(),
+		Create:        &schemaCreate,
+	}))
+
+}
+
+func noDeletesLinkSchemaExists(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+
+	fromModelName := uuid.NewString()
+	fromModelID := clienttest.NewPennsieveSchemaID()
+
+	initialIDStore := processor.NewIDStoreBuilder().
+		WithModel(fromModelName, fromModelID).
+		Build()
+
+	linkSchemaID := clienttest.NewPennsieveSchemaID()
+
+	mockServer := mock.NewModelService(t)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().WithIDStore(initialIDStore).Build(t, mockServer.URL())
+
+	require.NoError(t, testProcessor.ProcessLinkChangesInstanceDeletes(datasetID, clientmodels.LinkedPropertyChanges{
+		FromModelName: fromModelName,
+		ToModelName:   uuid.NewString(),
+		ID:            linkSchemaID,
+	}))
+
+}
+
+func deletes(t *testing.T) {
+	datasetID := processortest.NewDatasetID()
+
+	fromModelName := uuid.NewString()
+	fromModelID := clienttest.NewPennsieveSchemaID()
+
+	linkInstance1ID := clienttest.NewPennsieveInstanceID()
+	fromExternal1ID := clienttest.NewExternalInstanceID()
+	fromRecord1ID := clienttest.NewPennsieveInstanceID()
+
+	linkInstance2ID := clienttest.NewPennsieveInstanceID()
+	fromExternal2ID := clienttest.NewExternalInstanceID()
+	fromRecord2ID := clienttest.NewPennsieveInstanceID()
+
+	initialIDStore := processor.NewIDStoreBuilder().
+		WithModel(fromModelName, fromModelID).
+		WithRecord(fromModelID, fromExternal1ID, fromRecord1ID).
+		WithRecord(fromModelID, fromExternal2ID, fromRecord2ID).
+		Build()
+
+	linkSchemaID := clienttest.NewPennsieveSchemaID()
+
+	expectedCall1 := mock.NewExpectedDeleteLinkInstanceCall(datasetID, fromModelID, fromRecord1ID, linkInstance1ID)
+	expectedCall2 := mock.NewExpectedDeleteLinkInstanceCall(datasetID, fromModelID, fromRecord2ID, linkInstance2ID)
+
+	mockServer := mock.NewModelService(t, expectedCall1, expectedCall2)
+	defer mockServer.Close()
+
+	testProcessor := processortest.NewBuilder().WithIDStore(initialIDStore).Build(t, mockServer.URL())
+
+	require.NoError(t, testProcessor.ProcessLinkChangesInstanceDeletes(datasetID, clientmodels.LinkedPropertyChanges{
+		FromModelName: fromModelName,
+		ToModelName:   uuid.NewString(),
+		ID:            linkSchemaID,
+		Instances: clientmodels.InstanceChanges{
+			Delete: []clientmodels.InstanceLinkedPropertyDelete{
+				{
+					FromRecordID:             fromRecord1ID,
+					InstanceLinkedPropertyID: linkInstance1ID,
+				},
+				{
+					FromRecordID:             fromRecord2ID,
+					InstanceLinkedPropertyID: linkInstance2ID,
+				},
+			},
+		},
+	}))
+
+	mockServer.AssertAllCalledExactlyOnce(t)
+}
