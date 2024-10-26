@@ -76,7 +76,11 @@ func (p *MetadataPostProcessor) ProcessDeletes(datasetID string, datasetChanges 
 	if err := p.ProcessLinkInstanceDeletes(datasetID, datasetChanges.LinkedProperties); err != nil {
 		return err
 	}
-	// TODO add in proxy deletes before record deletes
+	if proxyChanges := datasetChanges.Proxies; proxyChanges != nil {
+		if err := p.ProcessProxyInstanceDeletes(datasetID, *proxyChanges); err != nil {
+			return err
+		}
+	}
 	if err := p.ProcessRecordDeletes(datasetID, datasetChanges.Models); err != nil {
 		return err
 	}

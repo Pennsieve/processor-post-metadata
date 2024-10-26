@@ -159,9 +159,9 @@ func TestMetadataPostProcessor_ProcessModelChangeRecordDeletes(t *testing.T) {
 	for scenario, testFunc := range map[string]func(t *testing.T){
 		"no deletes, model does not exist": noDeletesModelDoesNotExist,
 		"no deletes, model exists":         noDeletesModelExists,
-		"one delete":                       oneDelete,
-		"several deletes":                  severalDeletes,
-		"failed deletes":                   failedDeletes,
+		"one delete":                       oneRecordDelete,
+		"several deletes":                  severalRecordDeletes,
+		"failed deletes":                   failedRecordDeletes,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			testFunc(t)
@@ -198,7 +198,7 @@ func noDeletesModelExists(t *testing.T) {
 	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{ID: modelID}))
 }
 
-func oneDelete(t *testing.T) {
+func oneRecordDelete(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
 	modelID := clienttest.NewPennsieveSchemaID()
 
@@ -221,7 +221,7 @@ func oneDelete(t *testing.T) {
 	mockServer.AssertAllCalledExactlyOnce(t)
 }
 
-func severalDeletes(t *testing.T) {
+func severalRecordDeletes(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
 	modelID := clienttest.NewPennsieveSchemaID()
 
@@ -244,7 +244,7 @@ func severalDeletes(t *testing.T) {
 	mockServer.AssertAllCalledExactlyOnce(t)
 }
 
-func failedDeletes(t *testing.T) {
+func failedRecordDeletes(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
 	modelID := clienttest.NewPennsieveSchemaID()
 

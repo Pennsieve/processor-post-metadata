@@ -29,7 +29,7 @@ func NewModelService(t *testing.T, expectedCall ...ExpectedCall) *ModelService {
 
 func (m *ModelService) AssertAllCalledExactlyOnce(t *testing.T) bool {
 	for _, expectedCall := range m.ExpectedCalls {
-		if !assert.Equal(t, 1, expectedCall.CallCount(), "%s was called %d times", expectedCall.Signature(), expectedCall.CallCount()) {
+		if !assert.True(t, expectedCall.AllCalledExactlyOnce(), "%s was called %v times", expectedCall.Signature(), expectedCall.CallCounts()) {
 			return false
 		}
 	}

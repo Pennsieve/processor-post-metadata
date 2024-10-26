@@ -123,7 +123,7 @@ func TestMetadataPostProcessor_ProcessLinkChangesInstanceDeletes(t *testing.T) {
 	for scenario, testFunc := range map[string]func(t *testing.T){
 		"no deletes, schema does not exist": noDeletesLinkSchemaDoesNotExist,
 		"no deletes, schema exists":         noDeletesLinkSchemaExists,
-		"deletes":                           deletes,
+		"deletes":                           linkDeletes,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			testFunc(t)
@@ -181,7 +181,7 @@ func noDeletesLinkSchemaExists(t *testing.T) {
 
 }
 
-func deletes(t *testing.T) {
+func linkDeletes(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
 
 	fromModelName := uuid.NewString()

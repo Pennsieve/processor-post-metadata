@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// Builder is a processor.MetadataPostProcessor builder for tests
 type Builder struct {
 	integrationID   *string
 	inputDirectory  *string
