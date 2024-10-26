@@ -89,9 +89,9 @@ func (e *ExpectedAPICallMulti[I, O]) HandlerFunction(t *testing.T) func(http.Res
 		// Read the actual body once and compare in slices.IndexFunc to see if
 		// there is matching call in e
 		var actualRequestBody I
-		var actualRequestBodyString string
-		var requestBodyBytes bytes.Buffer
-		tee := io.TeeReader(request.Body, &requestBodyBytes)
+		// saving the actual body bytes in case we need them as a string for an error message later onDo
+		var actualRequestBodyBytes bytes.Buffer
+		tee := io.TeeReader(request.Body, &actualRequestBodyBytes)
 		requestBodyDecodeError := json.NewDecoder(tee).Decode(&actualRequestBody)
 		if requestBodyDecodeError != nil && !errors.Is(requestBodyDecodeError, io.EOF) {
 			// If there is an error other than EOF fail test now.
@@ -100,21 +100,16 @@ func (e *ExpectedAPICallMulti[I, O]) HandlerFunction(t *testing.T) func(http.Res
 			require.NoError(t, requestBodyDecodeError)
 		}
 
-		actualRequestBodyString = requestBodyBytes.String()
-
 		callIndex := slices.IndexFunc(e.Calls, func(e ExpectedAPICallData[I, O]) bool {
 			if e.Method != request.Method {
 				return false
 			}
-			var requestBodyMatches bool
 			if e.ExpectedRequestBody == nil {
-				requestBodyMatches = errors.Is(requestBodyDecodeError, io.EOF)
-			} else {
-				requestBodyMatches = reflect.DeepEqual(*e.ExpectedRequestBody, actualRequestBody)
+				return errors.Is(requestBodyDecodeError, io.EOF)
 			}
-			return requestBodyMatches
+			return reflect.DeepEqual(*e.ExpectedRequestBody, actualRequestBody)
 		})
-		require.GreaterOrEqual(t, callIndex, 0, "unexpected call to %s: method: %s, body %s", e.APIPath, request.Method, actualRequestBodyString)
+		require.GreaterOrEqual(t, callIndex, 0, "unexpected call to %s: method: %s, body %s", e.APIPath, request.Method, actualRequestBodyBytes.String())
 		call := &e.Calls[callIndex]
 		call.callCount += 1
 		responseBytes, err := json.Marshal(call.APIResponse)

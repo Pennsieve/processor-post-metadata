@@ -46,3 +46,5 @@ func (p *MetadataPostProcessor) ProcessProxyRecordChangesDeletes(datasetID strin
 	proxyLogger.Info("finished proxy deletes", slog.Int("count", len(proxyRecordChanges.InstanceIDDeletes)))
 	return nil
 }
+
+// TODO process non-delete proxy changes and test
