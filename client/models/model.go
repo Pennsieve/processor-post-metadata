@@ -5,7 +5,16 @@ import (
 	"fmt"
 )
 
-// PennsieveInstanceID is the internal ID of the record in Pennsieve. Not usually seen by user, but needed for API calls
+// PennsieveSchemaID is the internal ID of a model or other schema object in Pennsieve.
+// Not usually seen by user, but needed for API calls
+type PennsieveSchemaID string
+
+func (i PennsieveSchemaID) String() string {
+	return string(i)
+}
+
+// PennsieveInstanceID is the internal ID of the record or other instance in Pennsieve.
+// Not usually seen by user, but needed for API calls
 type PennsieveInstanceID string
 
 // ExternalInstanceID is an ID that the user supplies, or we can calculate from the values a user supplies. It identifies
@@ -15,7 +24,7 @@ type ExternalInstanceID string
 type ModelChanges struct {
 	// The ID of the model. Can be empty or missing if the model does not exist.
 	// In this case, Create below should be non-nil
-	ID string `json:"id,omitempty"`
+	ID PennsieveSchemaID `json:"id,omitempty"`
 	// If Create is non-nil, the model should be created
 	Create *ModelPropsCreate `json:"create,omitempty"`
 	// Records describes the changes to the records of this model type
@@ -62,8 +71,6 @@ func (pc *PropertyCreate) SetDataType(dataType any) error {
 }
 
 type RecordChanges struct {
-	// If DeleteAll is true, delete all records for the model. Model.ID should be non-empty in this case.
-	DeleteAll bool `json:"delete_all"`
 	// A list of RecordIDs to delete
 	Delete []PennsieveInstanceID `json:"delete"`
 	// Create are records that should be created
@@ -72,8 +79,14 @@ type RecordChanges struct {
 	Update []RecordUpdate `json:"update"`
 }
 
-// RecordCreate can be used as a payload for POST /models/datasets/<dataset id>/concepts/<model id>/instances
-type RecordCreate RecordValues
+// RecordCreate wraps a RecordValues that can be used as a payload for
+// POST /models/datasets/<dataset id>/concepts/<model id>/instances to create a new record.
+// The ExternalID is not part of the payload, but is a non-pennsieve identifier for the record that
+// can be used to map this record to the eventual PennsieveInstanceID needed for links or package proxies
+type RecordCreate struct {
+	ExternalID ExternalInstanceID `json:"external_id"`
+	RecordValues
+}
 
 type RecordValue struct {
 	Value any    `json:"value"`

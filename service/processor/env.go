@@ -37,12 +37,14 @@ func FromEnv() (*MetadataPostProcessor, error) {
 	if err != nil {
 		return nil, err
 	}
+	idStore := NewIDStoreBuilder().Build()
 	return NewMetadataPostProcessor(integrationID,
 		inputDirectory,
 		outputDirectory,
 		sessionToken,
 		apiHost,
 		api2Host,
+		idStore,
 	)
 }
 

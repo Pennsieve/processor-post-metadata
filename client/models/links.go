@@ -5,9 +5,17 @@ package models
 // Executing the changeset will depend on other models and records existing, so it should only be executed once
 // those model changesets have been executed.
 type LinkedPropertyChanges struct {
+	// FromModelName is the name of the model that plays the "from" role in this link.
+	// It will be needed to look up the schema id of the model as well as instance ids of "from" records
+	FromModelName string `json:"from_model_name"`
+
+	// ToModelName is the name of the model that plays the "to" role in this link.
+	// It will be needed to look up instance ids of "to" records
+	ToModelName string `json:"to_model_name"`
+
 	// The ID of the LinkedProperty in the schema. Can be empty or missing if the linkedProperty does not exist.
 	// In this case, Create below should be non-nil
-	ID string `json:"id,omitempty"`
+	ID PennsieveSchemaID `json:"id,omitempty"`
 
 	// If Create is non-nil, the link schema should be created in the model schema
 	Create *SchemaLinkedPropertyCreate `json:"create,omitempty"`
@@ -25,12 +33,6 @@ type SchemaLinkedPropertyCreate struct {
 
 	// DisplayName is the display name of the linked property in the schema of the parent model
 	DisplayName string `json:"display_name"`
-
-	// FromModelName is the name of the parent model of the linked proeprty, i.e., the "from" model
-	FromModelName string `json:"from_model_name"`
-
-	// ToModelName is the name of the model of the child model of the linked property, i.e., the "to" model
-	ToModelName string `json:"to_model_name"`
 
 	// Position is the position of the linked property in the schema of the parent model. (?)
 	Position int `json:"position"`
