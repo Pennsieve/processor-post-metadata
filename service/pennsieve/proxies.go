@@ -7,20 +7,9 @@ import (
 	"net/http"
 )
 
-var createProxyRelationshipSchemaBody = struct {
-	Name        string   `json:"name"`
-	DisplayName string   `json:"displayName"`
-	Description string   `json:"description"`
-	Schema      []string `json:"schema"`
-}{
-	Name:        models.ProxyRelationshipSchemaName,
-	DisplayName: "Belongs To",
-	Schema:      make([]string, 0),
-}
-
 func (s *Session) CreateProxyRelationshipSchema(datasetID string) (clientmodels.PennsieveSchemaID, error) {
 	url := fmt.Sprintf("%s/models/datasets/%s/relationships", s.APIHost, datasetID)
-	response, err := s.InvokePennsieve(http.MethodPost, url, createProxyRelationshipSchemaBody)
+	response, err := s.InvokePennsieve(http.MethodPost, url, models.NewCreateProxyRelationshipSchemaBody())
 	if err != nil {
 		return "", fmt.Errorf("error creating proxy relationship schema: %w", err)
 	}

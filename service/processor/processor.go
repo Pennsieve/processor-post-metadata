@@ -70,6 +70,9 @@ func (p *MetadataPostProcessor) Run() error {
 	if err := p.ProcessLinks(datasetID, datasetChanges.LinkedProperties); err != nil {
 		return err
 	}
+	if err := p.ProcessProxyChanges(datasetID, datasetChanges.Proxies); err != nil {
+		return err
+	}
 	logger.Info("finished metadata processing")
 	return nil
 }

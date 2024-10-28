@@ -4,6 +4,21 @@ import clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
 
 const ProxyRelationshipSchemaName = "belongs_to"
 
+type CreateProxyRelationshipSchemaBody struct {
+	Name        string   `json:"name"`
+	DisplayName string   `json:"displayName"`
+	Description string   `json:"description"`
+	Schema      []string `json:"schema"`
+}
+
+func NewCreateProxyRelationshipSchemaBody() CreateProxyRelationshipSchemaBody {
+	return CreateProxyRelationshipSchemaBody{
+		Name:        ProxyRelationshipSchemaName,
+		DisplayName: "Belongs To",
+		Schema:      make([]string, 0),
+	}
+}
+
 type CreateProxyInstanceBody struct {
 	// ExternalID is the package node id
 	ExternalID string                      `json:"externalId"`

@@ -1,15 +1,11 @@
 package processor_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/google/uuid"
-	"github.com/pennsieve/processor-post-metadata/service/models"
+	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock"
 	"github.com/pennsieve/processor-post-metadata/service/processor"
 	"github.com/pennsieve/processor-post-metadata/service/processor/internal/processortest"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 )
 
@@ -21,31 +17,14 @@ func TestCurationExportSyncProcessor_Run(t *testing.T) {
 	sessionToken := uuid.NewString()
 
 	datasetID := processortest.NewDatasetID()
-	mockServer := newMockServer(t, integrationID, datasetID)
+	expectedIntegrationsCall := mock.NewExpectedGetIntegrationCall(integrationID, datasetID)
+	mockServer := mock.NewModelService(t, expectedIntegrationsCall)
 	defer mockServer.Close()
 
-	testProcessor, err := processor.NewMetadataPostProcessor(integrationID, inputDirectory, outputDirectory, sessionToken, mockServer.URL, mockServer.URL, nil)
+	idStore := processor.NewIDStoreBuilder().Build()
+
+	testProcessor, err := processor.NewMetadataPostProcessor(integrationID, inputDirectory, outputDirectory, sessionToken, mockServer.URL(), mockServer.URL(), idStore)
 	require.NoError(t, err)
 
 	require.NoError(t, testProcessor.Run())
-}
-
-func newMockServer(t *testing.T, integrationID string, datasetID string) *httptest.Server {
-	mux := http.NewServeMux()
-	mux.HandleFunc(fmt.Sprintf("/integrations/%s", integrationID), func(writer http.ResponseWriter, request *http.Request) {
-		require.Equal(t, http.MethodGet, request.Method, "expected method %s for %s, got %s", http.MethodGet, request.URL, request.Method)
-		integration := models.Integration{
-			Uuid:          uuid.NewString(),
-			ApplicationID: 0,
-			DatasetNodeID: datasetID,
-		}
-		integrationResponse, err := json.Marshal(integration)
-		require.NoError(t, err)
-		_, err = writer.Write(integrationResponse)
-		require.NoError(t, err)
-	})
-	mux.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		require.Fail(t, "unexpected call to Pennsieve", "%s %s", request.Method, request.URL)
-	})
-	return httptest.NewServer(mux)
 }
