@@ -7,10 +7,9 @@ replace github.com/pennsieve/processor-post-metadata/client => ./../client
 require (
 	github.com/google/uuid v1.6.0
 	github.com/pennsieve/processor-post-metadata/client v0.0.0-20241017161214-7ed76902fd93
+	github.com/pennsieve/processor-pre-metadata/client v0.0.1
 	github.com/stretchr/testify v1.9.0
 )
-
-require github.com/pennsieve/processor-pre-metadata/client v0.0.0
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
