@@ -5,6 +5,7 @@ import (
 	"github.com/pennsieve/processor-post-metadata/client/clienttest"
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
 	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock"
+	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock/expectedcalls"
 	"github.com/pennsieve/processor-post-metadata/service/processor"
 	"github.com/pennsieve/processor-post-metadata/service/processor/internal/processortest"
 	"github.com/pennsieve/processor-pre-metadata/client/models/datatypes"
@@ -38,9 +39,9 @@ func createModel(t *testing.T) {
 
 	recordCreateValues := clienttest.NewRecordValues(clienttest.NewRecordValueSimple(t, datatypes.StringType))
 
-	expectedCreateCall := mock.NewExpectedModelCreateCall(datasetID, modelID, modelCreate)
-	expectedPropsCreateCall := mock.NewExpectedPropertiesCreateCall(datasetID, modelID, propertiesCreate)
-	expectedRecordCreateCall := mock.NewExpectedRecordCreateCall(datasetID, modelID, recordCreateValues)
+	expectedCreateCall := expectedcalls.ModelCreate(datasetID, modelID, modelCreate)
+	expectedPropsCreateCall := expectedcalls.PropertiesCreate(datasetID, modelID, propertiesCreate)
+	expectedRecordCreateCall := expectedcalls.RecordCreate(datasetID, modelID, recordCreateValues)
 
 	mockServer := mock.NewModelService(t,
 		expectedCreateCall,
@@ -85,7 +86,7 @@ func createRecordModelExists(t *testing.T) {
 	externalRecordID := clienttest.NewExternalInstanceID()
 
 	recordCreateValues := clienttest.NewRecordValues(clienttest.NewRecordValueSimple(t, datatypes.DoubleType))
-	expectedRecordCreateCall := mock.NewExpectedRecordCreateCall(datasetID, modelID, recordCreateValues)
+	expectedRecordCreateCall := expectedcalls.RecordCreate(datasetID, modelID, recordCreateValues)
 
 	mockServer := mock.NewModelService(t, expectedRecordCreateCall)
 	defer mockServer.Close()
@@ -130,7 +131,7 @@ func updateRecord(t *testing.T) {
 		clienttest.NewRecordValueSimple(t, datatypes.DoubleType),
 		clienttest.NewRecordValueSimple(t, datatypes.StringType),
 	)
-	expectedRecordUpdateCall := mock.NewExpectedRecordUpdateCall(datasetID, modelID, recordID, recordUpdateValues)
+	expectedRecordUpdateCall := expectedcalls.RecordUpdate(datasetID, modelID, recordID, recordUpdateValues)
 
 	mockServer := mock.NewModelService(t, expectedRecordUpdateCall)
 	defer mockServer.Close()
@@ -204,7 +205,7 @@ func oneRecordDelete(t *testing.T) {
 
 	toDelete := []clientmodels.PennsieveInstanceID{clienttest.NewPennsieveInstanceID()}
 
-	expectedDeleteCall := mock.NewExpectedRecordDeleteCall(datasetID, modelID, toDelete)
+	expectedDeleteCall := expectedcalls.RecordDelete(datasetID, modelID, toDelete)
 
 	mockServer := mock.NewModelService(t, expectedDeleteCall)
 	defer mockServer.Close()
@@ -227,7 +228,7 @@ func severalRecordDeletes(t *testing.T) {
 
 	toDelete := []clientmodels.PennsieveInstanceID{clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID()}
 
-	expectedDeleteCall := mock.NewExpectedRecordDeleteCall(datasetID, modelID, toDelete)
+	expectedDeleteCall := expectedcalls.RecordDelete(datasetID, modelID, toDelete)
 
 	mockServer := mock.NewModelService(t, expectedDeleteCall)
 	defer mockServer.Close()
@@ -250,7 +251,7 @@ func failedRecordDeletes(t *testing.T) {
 
 	toDelete := []clientmodels.PennsieveInstanceID{clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID(), clienttest.NewPennsieveInstanceID()}
 
-	expectedDeleteCall := mock.NewExpectedRecordDeleteCallFailure(datasetID, modelID, toDelete)
+	expectedDeleteCall := expectedcalls.RecordDeleteFailure(datasetID, modelID, toDelete)
 
 	mockServer := mock.NewModelService(t, expectedDeleteCall)
 	defer mockServer.Close()

@@ -5,6 +5,7 @@ import (
 	"github.com/pennsieve/processor-post-metadata/client/clienttest"
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
 	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock"
+	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock/expectedcalls"
 	"github.com/pennsieve/processor-post-metadata/service/models"
 	"github.com/pennsieve/processor-post-metadata/service/processor"
 	"github.com/pennsieve/processor-post-metadata/service/processor/internal/processortest"
@@ -50,13 +51,13 @@ func createLinkSchema(t *testing.T) {
 		Position:    schemaCreate.Position,
 	}
 
-	expectedSchemaCreateCall := mock.NewExpectedCreateLinkSchemaCall(datasetID, fromModelID, expectedSchemaCreateBody)
+	expectedSchemaCreateCall := expectedcalls.CreateLinkSchema(datasetID, fromModelID, expectedSchemaCreateBody)
 
 	expectedInstanceCreateBody := models.CreateLinkInstanceBody{
 		SchemaLinkedPropertyId: clientmodels.PennsieveSchemaID(expectedSchemaCreateCall.APIResponse.ID),
 		To:                     toRecordID,
 	}
-	expectedInstanceCreateCall := mock.NewExpectedCreateLinkInstanceCall(datasetID, fromModelID, fromRecordID, expectedInstanceCreateBody)
+	expectedInstanceCreateCall := expectedcalls.CreateLinkInstance(datasetID, fromModelID, fromRecordID, expectedInstanceCreateBody)
 
 	mockServer := mock.NewModelService(t, expectedSchemaCreateCall, expectedInstanceCreateCall)
 	defer mockServer.Close()
@@ -100,7 +101,7 @@ func createLinkInstance(t *testing.T) {
 		SchemaLinkedPropertyId: linkSchemaID,
 		To:                     toRecordID,
 	}
-	expectedInstanceCreateCall := mock.NewExpectedCreateLinkInstanceCall(datasetID, fromModelID, fromRecordID, expectedInstanceCreateBody)
+	expectedInstanceCreateCall := expectedcalls.CreateLinkInstance(datasetID, fromModelID, fromRecordID, expectedInstanceCreateBody)
 
 	mockServer := mock.NewModelService(t, expectedInstanceCreateCall)
 	defer mockServer.Close()
@@ -203,8 +204,8 @@ func linkDeletes(t *testing.T) {
 
 	linkSchemaID := clienttest.NewPennsieveSchemaID()
 
-	expectedCall1 := mock.NewExpectedDeleteLinkInstanceCall(datasetID, fromModelID, fromRecord1ID, linkInstance1ID)
-	expectedCall2 := mock.NewExpectedDeleteLinkInstanceCall(datasetID, fromModelID, fromRecord2ID, linkInstance2ID)
+	expectedCall1 := expectedcalls.DeleteLinkInstance(datasetID, fromModelID, fromRecord1ID, linkInstance1ID)
+	expectedCall2 := expectedcalls.DeleteLinkInstance(datasetID, fromModelID, fromRecord2ID, linkInstance2ID)
 
 	mockServer := mock.NewModelService(t, expectedCall1, expectedCall2)
 	defer mockServer.Close()

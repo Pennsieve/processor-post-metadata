@@ -6,6 +6,7 @@ import (
 	"github.com/pennsieve/processor-post-metadata/client/clienttest"
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
 	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock"
+	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock/expectedcalls"
 	"github.com/pennsieve/processor-post-metadata/service/models"
 	"github.com/pennsieve/processor-post-metadata/service/processor"
 	"github.com/pennsieve/processor-post-metadata/service/processor/internal/processortest"
@@ -38,7 +39,7 @@ func testEmptyChangeset(t *testing.T) {
 	changesetFilePath := processor.ChangesetFilePath(outputDirectory)
 	writeChangeset(t, changeset, changesetFilePath)
 
-	mockServer := mock.NewModelService(t, mock.NewExpectedGetIntegrationCall(integrationID, datasetID))
+	mockServer := mock.NewModelService(t, expectedcalls.GetIntegration(integrationID, datasetID))
 	defer mockServer.Close()
 
 	testProcessor := processortest.NewBuilder().
@@ -67,9 +68,9 @@ func testCreateModelAndRecord(t *testing.T) {
 
 	recordCreateValues := clienttest.NewRecordValues(clienttest.NewRecordValueSimple(t, datatypes.StringType))
 
-	expectedCreateCall := mock.NewExpectedModelCreateCall(datasetID, modelID, modelCreate)
-	expectedPropsCreateCall := mock.NewExpectedPropertiesCreateCall(datasetID, modelID, propertiesCreate)
-	expectedRecordCreateCall := mock.NewExpectedRecordCreateCall(datasetID, modelID, recordCreateValues)
+	expectedCreateCall := expectedcalls.ModelCreate(datasetID, modelID, modelCreate)
+	expectedPropsCreateCall := expectedcalls.PropertiesCreate(datasetID, modelID, propertiesCreate)
+	expectedRecordCreateCall := expectedcalls.RecordCreate(datasetID, modelID, recordCreateValues)
 
 	createdRecordExternalID := clienttest.NewExternalInstanceID()
 
@@ -95,7 +96,7 @@ func testCreateModelAndRecord(t *testing.T) {
 	writeChangeset(t, changeset, changesetFilePath)
 
 	mockServer := mock.NewModelService(t,
-		mock.NewExpectedGetIntegrationCall(integrationID, datasetID),
+		expectedcalls.GetIntegration(integrationID, datasetID),
 		expectedCreateCall,
 		expectedPropsCreateCall,
 		expectedRecordCreateCall)
@@ -177,8 +178,8 @@ func testCreateLinkBetweenTwoExistingRecords(t *testing.T) {
 	writeChangeset(t, changeset, changesetFilePath)
 
 	mockServer := mock.NewModelService(t,
-		mock.NewExpectedGetIntegrationCall(integrationID, datasetID),
-		mock.NewExpectedCreateLinkInstanceCall(datasetID, fromModelID, fromRecordID, models.CreateLinkInstanceBody{
+		expectedcalls.GetIntegration(integrationID, datasetID),
+		expectedcalls.CreateLinkInstance(datasetID, fromModelID, fromRecordID, models.CreateLinkInstanceBody{
 			SchemaLinkedPropertyId: linkSchemaID,
 			To:                     toRecordID,
 		}))
@@ -234,8 +235,8 @@ func testLinkPackageToExistingRecord(t *testing.T) {
 	writeChangeset(t, changeset, changesetFilePath)
 
 	mockServer := mock.NewModelService(t,
-		mock.NewExpectedGetIntegrationCall(integrationID, datasetID),
-		mock.NewExpectedCreateProxyInstanceCall(datasetID, models.NewCreateProxyInstanceBody(targetRecordID, packageNodeID)),
+		expectedcalls.GetIntegration(integrationID, datasetID),
+		expectedcalls.CreateProxyInstance(datasetID, models.NewCreateProxyInstanceBody(targetRecordID, packageNodeID)),
 	)
 	defer mockServer.Close()
 

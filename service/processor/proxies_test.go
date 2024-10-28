@@ -6,6 +6,7 @@ import (
 	"github.com/pennsieve/processor-post-metadata/client/clienttest"
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
 	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock"
+	"github.com/pennsieve/processor-post-metadata/service/internal/test/mock/expectedcalls"
 	"github.com/pennsieve/processor-post-metadata/service/models"
 	"github.com/pennsieve/processor-post-metadata/service/processor"
 	"github.com/pennsieve/processor-post-metadata/service/processor/internal/processortest"
@@ -110,7 +111,7 @@ func proxyDeletes(t *testing.T) {
 
 	target2ProxyInstanceID := clienttest.NewPennsieveInstanceID()
 
-	expectedCall := mock.NewExpectedDeleteProxyInstancesCall(datasetID, models.DeleteProxyInstancesBody{
+	expectedCall := expectedcalls.DeleteProxyInstances(datasetID, models.DeleteProxyInstancesBody{
 		SourceRecordID:   targetRecordID,
 		ProxyInstanceIDs: []clientmodels.PennsieveInstanceID{targetProxyInstanceID, targetProxyInstance2IO},
 	}, models.DeleteProxyInstancesBody{
@@ -170,11 +171,11 @@ func createProxySchemaAndInstances(t *testing.T) {
 	nodeID1 := NewPackageNodeID()
 	nodeID2 := NewPackageNodeID()
 
-	expectedCreateCals := mock.NewExpectedCreateProxyInstanceCall(datasetID,
+	expectedCreateCals := expectedcalls.CreateProxyInstance(datasetID,
 		models.NewCreateProxyInstanceBody(targetPennsieveID, nodeID1),
 		models.NewCreateProxyInstanceBody(targetPennsieveID, nodeID2))
 	mockServer := mock.NewModelService(t,
-		mock.NewExpectedCreateProxyRelationshipSchemaCall(datasetID),
+		expectedcalls.CreateProxyRelationshipSchema(datasetID),
 		expectedCreateCals)
 	defer mockServer.Close()
 
@@ -222,7 +223,7 @@ func proxySchemaExistsCreateInstances(t *testing.T) {
 		Build()
 
 	mockServer := mock.NewModelService(t,
-		mock.NewExpectedCreateProxyInstanceCall(datasetID,
+		expectedcalls.CreateProxyInstance(datasetID,
 			models.NewCreateProxyInstanceBody(targetRecordID, targetNodeID1),
 			models.NewCreateProxyInstanceBody(targetRecordID, targetNodeID2),
 			models.NewCreateProxyInstanceBody(target2RecordID, target2NodeID)),
