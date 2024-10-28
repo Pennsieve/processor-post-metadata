@@ -79,6 +79,7 @@ func (p *MetadataPostProcessor) Run() error {
 
 func (p *MetadataPostProcessor) ProcessDeletes(datasetID string, datasetChanges clientmodels.Dataset) error {
 	// Delete dependent objects, links and proxies before deleting records
+	logger.Info("starting deletes")
 	if err := p.ProcessLinkInstanceDeletes(datasetID, datasetChanges.LinkedProperties); err != nil {
 		return err
 	}
@@ -90,11 +91,19 @@ func (p *MetadataPostProcessor) ProcessDeletes(datasetID string, datasetChanges 
 	if err := p.ProcessRecordDeletes(datasetID, datasetChanges.Models); err != nil {
 		return err
 	}
+	logger.Info("finished deletes")
 	return nil
 }
 
+// ChangesetFilePath joins the given output directory with the
+// changeset file name.
+// Visible for testing.
+func ChangesetFilePath(outputDirectory string) string {
+	return filepath.Join(outputDirectory, client.Filename)
+}
+
 func (p *MetadataPostProcessor) changesetFilePath() string {
-	return filepath.Join(p.OutputDirectory, client.Filename)
+	return ChangesetFilePath(p.OutputDirectory)
 }
 
 func readChangesetFile(filePath string) (clientmodels.Dataset, error) {

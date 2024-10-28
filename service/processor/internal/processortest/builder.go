@@ -74,7 +74,14 @@ func (b *Builder) Build(t *testing.T, mockServerURL string) *processor.MetadataP
 		sessionToken = *b.sessionToken
 	}
 
-	testProcessor, err := processor.NewMetadataPostProcessor(integrationID, inputDirectory, outputDirectory, sessionToken, mockServerURL, mockServerURL, b.idStore)
+	var idStore *processor.IDStore
+	if b.idStore == nil {
+		idStore = processor.NewIDStoreBuilder().Build()
+	} else {
+		idStore = b.idStore
+	}
+
+	testProcessor, err := processor.NewMetadataPostProcessor(integrationID, inputDirectory, outputDirectory, sessionToken, mockServerURL, mockServerURL, idStore)
 	require.NoError(t, err)
 	return testProcessor
 }
