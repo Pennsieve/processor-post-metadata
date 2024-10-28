@@ -1,10 +1,11 @@
 package models
 
 type Dataset struct {
-	Models           []ModelChanges          `json:"models"`
-	LinkedProperties []LinkedPropertyChanges `json:"linked_properties"`
-	Proxies          *ProxyChanges           `json:"proxies"`
-	RecordIDMaps     []RecordIDMap           `json:"record_id_maps"`
+	Models             []ModelChanges               `json:"models"`
+	LinkedProperties   []LinkedPropertyChanges      `json:"linked_properties"`
+	Proxies            *ProxyChanges                `json:"proxies"`
+	ExistingModelIDMap map[string]PennsieveSchemaID `json:"existing_model_id_map"`
+	RecordIDMaps       []RecordIDMap                `json:"record_id_maps"`
 }
 
 type RecordIDMap struct {

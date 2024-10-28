@@ -52,6 +52,9 @@ func (p *MetadataPostProcessor) Run() error {
 		return err
 	}
 	logger.Info("read dataset changeset file", slog.String("path", p.changesetFilePath()))
+	// initialize the IDStore with model name -> id map for existing models
+	// If we create models in this changeset, those name -> id entries will be added as well
+	p.IDStore.AddModels(datasetChanges.ExistingModelIDMap)
 	if err := p.ProcessDeletes(datasetID, datasetChanges); err != nil {
 		return err
 	}

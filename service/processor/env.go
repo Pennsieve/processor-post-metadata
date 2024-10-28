@@ -2,7 +2,6 @@ package processor
 
 import (
 	"fmt"
-	metadataclient "github.com/pennsieve/processor-pre-metadata/client"
 	"os"
 )
 
@@ -38,11 +37,7 @@ func FromEnv() (*MetadataPostProcessor, error) {
 	if err != nil {
 		return nil, err
 	}
-	reader, err := metadataclient.NewReader(inputDirectory)
-	if err != nil {
-		return nil, fmt.Errorf("error creating metadata reader for %s: %w", inputDirectory, err)
-	}
-	idStore := NewIDStoreBuilder().WithSchema(reader.Schema).Build()
+	idStore := NewIDStoreBuilder().Build()
 	return NewMetadataPostProcessor(integrationID,
 		inputDirectory,
 		outputDirectory,

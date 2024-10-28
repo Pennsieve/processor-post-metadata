@@ -3,7 +3,6 @@ package processor
 import (
 	"fmt"
 	clientmodels "github.com/pennsieve/processor-post-metadata/client/models"
-	metadataclient "github.com/pennsieve/processor-pre-metadata/client"
 )
 
 type RecordIDKey struct {
@@ -21,6 +20,12 @@ type IDStore struct {
 
 func (s *IDStore) AddModel(name string, id clientmodels.PennsieveSchemaID) {
 	s.ModelByName[name] = id
+}
+
+func (s *IDStore) AddModels(nameToID map[string]clientmodels.PennsieveSchemaID) {
+	for name, id := range nameToID {
+		s.AddModel(name, id)
+	}
 }
 
 func (s *IDStore) AddRecord(modelID clientmodels.PennsieveSchemaID, externalID clientmodels.ExternalInstanceID, id clientmodels.PennsieveInstanceID) {
@@ -74,10 +79,8 @@ func NewIDStoreBuilder() *IDStoreBuilder {
 	}}
 }
 
-func (b *IDStoreBuilder) WithSchema(schema *metadataclient.Schema) *IDStoreBuilder {
-	for name, id := range schema.ModelIDsByName() {
-		b.store.ModelByName[name] = clientmodels.PennsieveSchemaID(id)
-	}
+func (b *IDStoreBuilder) WithModels(nameToID map[string]clientmodels.PennsieveSchemaID) *IDStoreBuilder {
+	b.store.AddModels(nameToID)
 	return b
 }
 
