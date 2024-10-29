@@ -33,6 +33,7 @@ func (e *ExpectedAPICall[I, _]) HandlerFunction(t *testing.T) func(http.Response
 	return func(writer http.ResponseWriter, request *http.Request) {
 		e.callCount += 1
 		require.Equal(t, e.Method, request.Method, "expected method %s for %s, got %s", e.Method, request.URL, request.Method)
+		require.Equal(t, "application/json", request.Header.Get("Content-Type"))
 		if e.ExpectedRequestBody == nil {
 			var requestBodyBytes []byte
 			_, err := request.Body.Read(requestBodyBytes)

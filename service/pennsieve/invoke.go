@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+const ApplicationJSON = "application/json"
+
 type Session struct {
 	Token    string
 	APIHost  string
@@ -32,7 +34,8 @@ func (s *Session) newPennsieveRequest(method string, url string, structBody any)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s %s request: %w", method, url, err)
 	}
-	request.Header.Add("accept", "application/json")
+	request.Header.Add("accept", ApplicationJSON)
+	request.Header.Add("Content-Type", ApplicationJSON)
 	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", s.Token))
 	return request, nil
 }
