@@ -58,7 +58,7 @@ func (p *MetadataPostProcessor) Run() error {
 	if err := p.ProcessDeletes(datasetID, datasetChanges); err != nil {
 		return err
 	}
-	if err := p.ProcessModels(datasetID, datasetChanges.Models); err != nil {
+	if err := p.ProcessModelCreatesUpdates(datasetID, datasetChanges.Models.Creates, datasetChanges.Models.Updates); err != nil {
 		return err
 	}
 	// Wait til after ProcessModels to add these so that the IDStore now should have the complete mapping
@@ -88,7 +88,7 @@ func (p *MetadataPostProcessor) ProcessDeletes(datasetID string, datasetChanges 
 			return err
 		}
 	}
-	if err := p.ProcessRecordDeletes(datasetID, datasetChanges.Models); err != nil {
+	if err := p.ProcessRecordModelDeletes(datasetID, datasetChanges.Models.Updates, datasetChanges.Models.Deletes); err != nil {
 		return err
 	}
 	logger.Info("finished deletes")

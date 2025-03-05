@@ -21,7 +21,7 @@ func (s *Session) CreateModelAndProps(datasetID string, modelPropsCreate clientm
 	return modelID, nil
 }
 
-func (s *Session) CreateModel(datasetID string, modelCreate clientmodels.ModelCreate) (clientmodels.PennsieveSchemaID, error) {
+func (s *Session) CreateModel(datasetID string, modelCreate clientmodels.ModelCreateParams) (clientmodels.PennsieveSchemaID, error) {
 	url := fmt.Sprintf("%s/models/datasets/%s/concepts", s.APIHost, datasetID)
 	response, err := s.InvokePennsieve(http.MethodPost, url, modelCreate)
 	if err != nil {
@@ -34,7 +34,16 @@ func (s *Session) CreateModel(datasetID string, modelCreate clientmodels.ModelCr
 	return clientmodels.PennsieveSchemaID(apiResponse.ID), nil
 }
 
-func (s *Session) CreateModelProperties(datasetID string, modelID clientmodels.PennsieveSchemaID, propsCreate clientmodels.PropertiesCreate) error {
+func (s *Session) DeleteModel(datasetID string, modelID clientmodels.PennsieveSchemaID) error {
+	url := fmt.Sprintf("%s/models/datasets/%s/concepts/%s", s.APIHost, datasetID, modelID)
+	_, err := s.InvokePennsieve(http.MethodDelete, url, nil)
+	if err != nil {
+		return fmt.Errorf("error deleting model %s: %w", modelID, err)
+	}
+	return nil
+}
+
+func (s *Session) CreateModelProperties(datasetID string, modelID clientmodels.PennsieveSchemaID, propsCreate clientmodels.PropertiesCreateParams) error {
 	if len(propsCreate) == 0 {
 		return nil
 	}

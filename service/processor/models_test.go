@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-func TestMetadataPostProcessor_ProcessModelChanges(t *testing.T) {
+func TestMetadataPostProcessor_ProcessModelCreatesUpdates(t *testing.T) {
 	for scenario, testFunc := range map[string]func(t *testing.T){
 		"create model and record":             createModel,
 		"create record; model already exists": createRecordModelExists,
@@ -32,7 +32,7 @@ func createModel(t *testing.T) {
 
 	modelCreate := clienttest.NewModelCreate()
 
-	propertiesCreate := clientmodels.PropertiesCreate{
+	propertiesCreate := clientmodels.PropertiesCreateParams{
 		clienttest.NewPropertyCreateSimple(t, datatypes.StringType),
 		clienttest.NewPropertyCreateArray(t, datatypes.DoubleType),
 	}
@@ -52,19 +52,17 @@ func createModel(t *testing.T) {
 	testProcessor := processortest.NewBuilder().WithIDStore(processor.NewIDStoreBuilder().Build()).Build(t, mockServer.URL())
 
 	createdRecordExternalID := clienttest.NewExternalInstanceID()
-	require.NoError(t, testProcessor.ProcessModelChanges(datasetID,
-		clientmodels.ModelChanges{
-			Create: &clientmodels.ModelPropsCreate{
+	require.NoError(t, testProcessor.ProcessModelCreatesUpdates(datasetID,
+		[]clientmodels.ModelCreate{{
+			Create: clientmodels.ModelPropsCreate{
 				Model:      modelCreate,
 				Properties: propertiesCreate,
 			},
-			Records: clientmodels.RecordChanges{
-				Create: []clientmodels.RecordCreate{{
-					ExternalID:   createdRecordExternalID,
-					RecordValues: recordCreateValues,
-				}},
-			},
-		}))
+			Records: []clientmodels.RecordCreate{{
+				ExternalID:   createdRecordExternalID,
+				RecordValues: recordCreateValues,
+			}},
+		}}, nil))
 	mockServer.AssertAllCalledExactlyOnce(t)
 
 	idStore := testProcessor.IDStore
@@ -95,17 +93,18 @@ func createRecordModelExists(t *testing.T) {
 		WithIDStore(processor.NewIDStoreBuilder().WithModel(modelName, modelID).Build()).
 		Build(t, mockServer.URL())
 
-	require.NoError(t, testProcessor.ProcessModelChanges(datasetID, clientmodels.ModelChanges{
-		ID: modelID,
-		Records: clientmodels.RecordChanges{
-			Create: []clientmodels.RecordCreate{
-				{
-					ExternalID:   externalRecordID,
-					RecordValues: recordCreateValues,
+	require.NoError(t, testProcessor.ProcessModelCreatesUpdates(datasetID, nil,
+		[]clientmodels.ModelUpdate{{
+			ID: modelID,
+			Records: clientmodels.RecordChanges{
+				Create: []clientmodels.RecordCreate{
+					{
+						ExternalID:   externalRecordID,
+						RecordValues: recordCreateValues,
+					},
 				},
 			},
-		},
-	}))
+		}}))
 
 	mockServer.AssertAllCalledExactlyOnce(t)
 
@@ -140,29 +139,29 @@ func updateRecord(t *testing.T) {
 		WithIDStore(processor.NewIDStoreBuilder().WithModel(uuid.NewString(), modelID).Build()).
 		Build(t, mockServer.URL())
 
-	require.NoError(t, testProcessor.ProcessModelChanges(datasetID, clientmodels.ModelChanges{
-		ID: modelID,
-		Records: clientmodels.RecordChanges{
-			Update: []clientmodels.RecordUpdate{
-				{
-					PennsieveID:  recordID,
-					RecordValues: recordUpdateValues,
+	require.NoError(t, testProcessor.ProcessModelCreatesUpdates(datasetID, nil,
+		[]clientmodels.ModelUpdate{{
+			ID: modelID,
+			Records: clientmodels.RecordChanges{
+				Update: []clientmodels.RecordUpdate{
+					{
+						PennsieveID:  recordID,
+						RecordValues: recordUpdateValues,
+					},
 				},
 			},
-		},
-	}))
+		}}))
 
 	mockServer.AssertAllCalledExactlyOnce(t)
 
 }
 
-func TestMetadataPostProcessor_ProcessModelChangeRecordDeletes(t *testing.T) {
+func TestMetadataPostProcessor_ProcessModelRecordDeletes(t *testing.T) {
 	for scenario, testFunc := range map[string]func(t *testing.T){
-		"no deletes, model does not exist": noDeletesModelDoesNotExist,
-		"no deletes, model exists":         noDeletesModelExists,
-		"one delete":                       oneRecordDelete,
-		"several deletes":                  severalRecordDeletes,
-		"failed deletes":                   failedRecordDeletes,
+		"no deletes":      noDeletes,
+		"one delete":      oneRecordDelete,
+		"several deletes": severalRecordDeletes,
+		"failed deletes":  failedRecordDeletes,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			testFunc(t)
@@ -170,24 +169,7 @@ func TestMetadataPostProcessor_ProcessModelChangeRecordDeletes(t *testing.T) {
 	}
 }
 
-func noDeletesModelDoesNotExist(t *testing.T) {
-	datasetID := processortest.NewDatasetID()
-	mockServer := mock.NewModelService(t)
-	defer mockServer.Close()
-
-	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
-
-	modelCreate := clienttest.NewModelCreate()
-
-	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
-		Create: &clientmodels.ModelPropsCreate{
-			Model:      modelCreate,
-			Properties: clientmodels.PropertiesCreate{clienttest.NewPropertyCreateSimple(t, datatypes.DoubleType)},
-		},
-	}))
-}
-
-func noDeletesModelExists(t *testing.T) {
+func noDeletes(t *testing.T) {
 	datasetID := processortest.NewDatasetID()
 	modelID := clienttest.NewPennsieveSchemaID()
 
@@ -196,7 +178,9 @@ func noDeletesModelExists(t *testing.T) {
 
 	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
 
-	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{ID: modelID}))
+	require.NoError(t, testProcessor.ProcessRecordDeletes(datasetID, modelID, []clientmodels.PennsieveInstanceID{}))
+	require.NoError(t, testProcessor.ProcessRecordDeletes(datasetID, modelID, nil))
+
 }
 
 func oneRecordDelete(t *testing.T) {
@@ -212,12 +196,7 @@ func oneRecordDelete(t *testing.T) {
 
 	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
 
-	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
-		ID: modelID,
-		Records: clientmodels.RecordChanges{
-			Delete: toDelete,
-		},
-	}))
+	require.NoError(t, testProcessor.ProcessRecordDeletes(datasetID, modelID, toDelete))
 
 	mockServer.AssertAllCalledExactlyOnce(t)
 }
@@ -235,12 +214,7 @@ func severalRecordDeletes(t *testing.T) {
 
 	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
 
-	require.NoError(t, testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
-		ID: modelID,
-		Records: clientmodels.RecordChanges{
-			Delete: toDelete,
-		},
-	}))
+	require.NoError(t, testProcessor.ProcessRecordDeletes(datasetID, modelID, toDelete))
 
 	mockServer.AssertAllCalledExactlyOnce(t)
 }
@@ -258,12 +232,7 @@ func failedRecordDeletes(t *testing.T) {
 
 	testProcessor := processortest.NewBuilder().Build(t, mockServer.URL())
 
-	err := testProcessor.ProcessModelChangeRecordDeletes(datasetID, clientmodels.ModelChanges{
-		ID: modelID,
-		Records: clientmodels.RecordChanges{
-			Delete: toDelete,
-		},
-	})
+	err := testProcessor.ProcessRecordDeletes(datasetID, modelID, toDelete)
 
 	require.Error(t, err)
 	for _, recordID := range toDelete {

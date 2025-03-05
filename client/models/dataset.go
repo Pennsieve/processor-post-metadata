@@ -1,7 +1,7 @@
 package models
 
 type Dataset struct {
-	Models             []ModelChanges               `json:"models"`
+	Models             ModelChanges                 `json:"models"`
 	LinkedProperties   []LinkedPropertyChanges      `json:"linked_properties"`
 	Proxies            *ProxyChanges                `json:"proxies"`
 	ExistingModelIDMap map[string]PennsieveSchemaID `json:"existing_model_id_map"`

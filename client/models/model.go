@@ -29,25 +29,50 @@ type ModelChanges struct {
 	Create *ModelPropsCreate `json:"create,omitempty"`
 	// Records describes the changes to the records of this model type
 	Records RecordChanges `json:"records"`
+
+	Creates []ModelCreate `json:"creates"`
+	Updates []ModelUpdate `json:"updates"`
+	Deletes []ModelDelete `json:"deletes"`
+}
+
+type ModelCreate struct {
+	// Create contains the params necessary to create the model and its (non-link) properties
+	Create ModelPropsCreate `json:"create"`
+	// Records are records that should be created
+	Records []RecordCreate `json:"records"`
+}
+
+type ModelUpdate struct {
+	// The ID of the model in Pennsieve.
+	ID PennsieveSchemaID `json:"id"`
+	// Records describes the changes to the records of this model type
+	Records RecordChanges `json:"records"`
+}
+
+type ModelDelete struct {
+	// The ID of the model in Pennsieve.
+	ID PennsieveSchemaID `json:"id"`
+	// A list of RecordIDs to delete. All records must be deleted in order to delete a model
+	Records []PennsieveInstanceID `json:"records"`
 }
 
 type ModelPropsCreate struct {
-	Model      ModelCreate      `json:"model"`
-	Properties PropertiesCreate `json:"properties"`
+	Model      ModelCreateParams      `json:"model"`
+	Properties PropertiesCreateParams `json:"properties"`
 }
 
-// ModelCreate can be used as a payload for POST /models/datasets/<dataset id>/concepts to create a model
-type ModelCreate struct {
+// ModelCreateParams can be used as a payload for POST /models/datasets/<dataset id>/concepts to create a model
+type ModelCreateParams struct {
 	Name        string `json:"name"`
 	DisplayName string `json:"displayName"`
 	Description string `json:"description"`
 	Locked      bool   `json:"locked"`
 }
 
-// PropertiesCreate can be uses as a payload for PUT /models/datasets/<dataset id>/concepts/<model id>/properties to add properties to a model
-type PropertiesCreate []PropertyCreate
+// PropertiesCreateParams can be uses as a payload for PUT /models/datasets/<dataset id>/concepts/<model id>/properties to add properties to a model
+type PropertiesCreateParams []PropertyCreateParams
 
-type PropertyCreate struct {
+type PropertyCreateParams struct {
 	DisplayName  string          `json:"displayName"`
 	Name         string          `json:"name"`
 	DataType     json.RawMessage `json:"dataType"`
@@ -61,7 +86,7 @@ type PropertyCreate struct {
 	Description  string          `json:"description"`
 }
 
-func (pc *PropertyCreate) SetDataType(dataType any) error {
+func (pc *PropertyCreateParams) SetDataType(dataType any) error {
 	bytes, err := json.Marshal(dataType)
 	if err != nil {
 		return fmt.Errorf("error marshalling data type: %w", err)
