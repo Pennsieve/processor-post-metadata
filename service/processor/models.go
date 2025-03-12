@@ -6,41 +6,61 @@ import (
 	"log/slog"
 )
 
-func (p *MetadataPostProcessor) ProcessRecordDeletes(datasetID string, modelChanges []clientmodels.ModelChanges) error {
-	if len(modelChanges) == 0 {
-		logger.Info("no record deletes")
-		return nil
+func (p *MetadataPostProcessor) ProcessRecordModelDeletes(datasetID string, modelUpdates []clientmodels.ModelUpdate, modelDeletes []clientmodels.ModelDelete) error {
+	for _, modelChange := range modelUpdates {
+		if err := p.ProcessRecordDeletes(datasetID, modelChange.ID, modelChange.Records.Delete); err != nil {
+			return err
+		}
 	}
-	for _, modelChange := range modelChanges {
-		if err := p.ProcessModelChangeRecordDeletes(datasetID, modelChange); err != nil {
+	for _, modelChange := range modelDeletes {
+		if err := p.ProcessRecordDeletes(datasetID, modelChange.ID, modelChange.Records); err != nil {
+			return err
+		}
+		// Now that records are deleted, we can delete the model
+		if err := p.ProcessModelDelete(datasetID, modelChange.ID); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (p *MetadataPostProcessor) ProcessModelChangeRecordDeletes(datasetID string, change clientmodels.ModelChanges) error {
-	modelLogger := logger.With(slog.Any("modelID", change.ID))
-	if len(change.Records.Delete) == 0 {
-		modelLogger.Info("no deletes")
+func (p *MetadataPostProcessor) ProcessRecordDeletes(datasetID string, modelID clientmodels.PennsieveSchemaID, recordIDs []clientmodels.PennsieveInstanceID) error {
+	modelLogger := logger.With(slog.Any("modelID", modelID))
+	if len(recordIDs) == 0 {
+		modelLogger.Info("no record deletes")
 		return nil
 	}
 	modelLogger.Info("starting record deletes")
-	if err := p.Pennsieve.DeleteRecords(datasetID, change.ID, change.Records.Delete); err != nil {
+	if err := p.Pennsieve.DeleteRecords(datasetID, modelID, recordIDs); err != nil {
 		return err
 	}
-	modelLogger.Info("finished record deletes", slog.Int("count", len(change.Records.Delete)))
+	modelLogger.Info("finished record deletes", slog.Int("count", len(recordIDs)))
 	return nil
 }
 
-func (p *MetadataPostProcessor) ProcessModels(datasetID string, modelChanges []clientmodels.ModelChanges) error {
-	if len(modelChanges) == 0 {
+func (p *MetadataPostProcessor) ProcessModelDelete(datasetID string, modelID clientmodels.PennsieveSchemaID) error {
+	modelLogger := logger.With(slog.Any("modelID", modelID))
+	modelLogger.Info("deleting model")
+	if err := p.Pennsieve.DeleteModel(datasetID, modelID); err != nil {
+		return err
+	}
+	modelLogger.Info("deleted model")
+	return nil
+}
+
+func (p *MetadataPostProcessor) ProcessModelCreatesUpdates(datasetID string, modelCreates []clientmodels.ModelCreate, modelUpdates []clientmodels.ModelUpdate) error {
+	if len(modelCreates)+len(modelUpdates) == 0 {
 		logger.Info("no model changes")
 		return nil
 	}
 	logger.Info("starting model changes")
-	for _, modelChange := range modelChanges {
-		if err := p.ProcessModelChanges(datasetID, modelChange); err != nil {
+	for _, modelChange := range modelCreates {
+		if err := p.ProcessModelCreate(datasetID, modelChange); err != nil {
+			return err
+		}
+	}
+	for _, modelChange := range modelUpdates {
+		if err := p.ProcessModelUpdate(datasetID, modelChange); err != nil {
 			return err
 		}
 	}
@@ -48,39 +68,47 @@ func (p *MetadataPostProcessor) ProcessModels(datasetID string, modelChanges []c
 	return nil
 }
 
-func (p *MetadataPostProcessor) ProcessModelChanges(datasetID string, modelChanges clientmodels.ModelChanges) error {
-	modelID, err := p.CreateModelIfNecessary(datasetID, modelChanges)
+func (p *MetadataPostProcessor) ProcessModelCreate(datasetID string, modelCreate clientmodels.ModelCreate) error {
+	modelID, err := p.CreateModel(datasetID, modelCreate.Create)
 	if err != nil {
 		return err
 	}
 	modelLogger := logger.With(slog.Any("modelID", modelID))
 	modelLogger.Info("creating records")
-	for _, recordCreate := range modelChanges.Records.Create {
+	for _, recordCreate := range modelCreate.Records {
 		if err := p.CreateRecord(datasetID, modelID, recordCreate); err != nil {
 			return err
 		}
 	}
-	modelLogger.Info("created records", slog.Int("count", len(modelChanges.Records.Create)))
+	modelLogger.Info("created records", slog.Int("count", len(modelCreate.Records)))
+	return nil
+}
+
+func (p *MetadataPostProcessor) ProcessModelUpdate(datasetID string, modelUpdate clientmodels.ModelUpdate) error {
+	modelID := modelUpdate.ID
+	modelLogger := logger.With(slog.Any("modelID", modelID))
+	modelLogger.Info("creating records")
+	for _, recordCreate := range modelUpdate.Records.Create {
+		if err := p.CreateRecord(datasetID, modelID, recordCreate); err != nil {
+			return err
+		}
+	}
+	modelLogger.Info("created records", slog.Int("count", len(modelUpdate.Records.Create)))
 	modelLogger.Info("updating records")
-	for _, recordUpdate := range modelChanges.Records.Update {
+	for _, recordUpdate := range modelUpdate.Records.Update {
 		if err := p.UpdateRecord(datasetID, modelID, recordUpdate); err != nil {
 			return err
 		}
 	}
-	modelLogger.Info("updated models", slog.Int("count", len(modelChanges.Records.Update)))
+	modelLogger.Info("updated models", slog.Int("count", len(modelUpdate.Records.Update)))
 
 	return nil
 }
 
-func (p *MetadataPostProcessor) CreateModelIfNecessary(datasetID string, modelChange clientmodels.ModelChanges) (clientmodels.PennsieveSchemaID, error) {
-	if modelChange.Create == nil {
-		logger.Info("model already exists", slog.Any("modelID", modelChange.ID))
-		return clientmodels.PennsieveSchemaID(modelChange.ID), nil
-	}
-	modelCreate := modelChange.Create
+func (p *MetadataPostProcessor) CreateModel(datasetID string, modelCreate clientmodels.ModelPropsCreate) (clientmodels.PennsieveSchemaID, error) {
 	modelLogger := logger.With(slog.String("modelName", modelCreate.Model.Name))
 	modelLogger.Info("creating model")
-	modelID, err := p.Pennsieve.CreateModelAndProps(datasetID, *modelCreate)
+	modelID, err := p.Pennsieve.CreateModelAndProps(datasetID, modelCreate)
 	if err != nil {
 		return "", fmt.Errorf("error creating model: %w", err)
 	}

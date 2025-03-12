@@ -61,7 +61,7 @@ func testCreateModelAndRecord(t *testing.T) {
 
 	modelCreate := clienttest.NewModelCreate()
 
-	propertiesCreate := clientmodels.PropertiesCreate{
+	propertiesCreate := clientmodels.PropertiesCreateParams{
 		clienttest.NewPropertyCreateSimple(t, datatypes.StringType),
 		clienttest.NewPropertyCreateArray(t, datatypes.DoubleType),
 	}
@@ -75,21 +75,19 @@ func testCreateModelAndRecord(t *testing.T) {
 	createdRecordExternalID := clienttest.NewExternalInstanceID()
 
 	changeset := clientmodels.Dataset{
-		Models: []clientmodels.ModelChanges{
-			{
-				Create: &clientmodels.ModelPropsCreate{
+		Models: clientmodels.ModelChanges{
+			Creates: []clientmodels.ModelCreate{{
+				Create: clientmodels.ModelPropsCreate{
 					Model:      modelCreate,
 					Properties: propertiesCreate,
 				},
-				Records: clientmodels.RecordChanges{
-					Create: []clientmodels.RecordCreate{
-						{
-							ExternalID:   createdRecordExternalID,
-							RecordValues: recordCreateValues,
-						},
+				Records: []clientmodels.RecordCreate{
+					{
+						ExternalID:   createdRecordExternalID,
+						RecordValues: recordCreateValues,
 					},
 				},
-			},
+			}},
 		},
 	}
 	changesetFilePath := processor.ChangesetFilePath(outputDirectory)

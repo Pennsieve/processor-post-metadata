@@ -9,8 +9,8 @@ import (
 	"math/rand"
 )
 
-func NewModelCreate() models.ModelCreate {
-	return models.ModelCreate{
+func NewModelCreate() models.ModelCreateParams {
+	return models.ModelCreateParams{
 		Name:        uuid.NewString(),
 		DisplayName: uuid.NewString(),
 		Description: uuid.NewString(),
@@ -18,10 +18,10 @@ func NewModelCreate() models.ModelCreate {
 	}
 }
 
-func NewPropertyCreateSimple(t require.TestingT, dataType datatypes.SimpleType) models.PropertyCreate {
+func NewPropertyCreateSimple(t require.TestingT, dataType datatypes.SimpleType) models.PropertyCreateParams {
 	bytes, err := json.Marshal(dataType)
 	require.NoError(t, err)
-	return models.PropertyCreate{
+	return models.PropertyCreateParams{
 		DisplayName:  uuid.NewString(),
 		Name:         uuid.NewString(),
 		DataType:     bytes,
@@ -36,10 +36,10 @@ func NewArrayDataType(itemType datatypes.SimpleType) datatypes.ArrayDataType {
 		Items: datatypes.ItemsType{Type: itemType},
 	}
 }
-func NewPropertyCreateArray(t require.TestingT, itemType datatypes.SimpleType) models.PropertyCreate {
+func NewPropertyCreateArray(t require.TestingT, itemType datatypes.SimpleType) models.PropertyCreateParams {
 	dataTypeBytes, err := json.Marshal(NewArrayDataType(itemType))
 	require.NoError(t, err)
-	return models.PropertyCreate{
+	return models.PropertyCreateParams{
 		DisplayName:  uuid.NewString(),
 		Name:         uuid.NewString(),
 		DataType:     dataTypeBytes,

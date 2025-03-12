@@ -9,8 +9,8 @@ import (
 	"net/http"
 )
 
-func ModelCreate(expectedDatasetID string, modelID clientmodels.PennsieveSchemaID, expectedCreate clientmodels.ModelCreate) *mock.ExpectedAPICall[clientmodels.ModelCreate, models.APIResponse] {
-	return &mock.ExpectedAPICall[clientmodels.ModelCreate, models.APIResponse]{
+func ModelCreate(expectedDatasetID string, modelID clientmodels.PennsieveSchemaID, expectedCreate clientmodels.ModelCreateParams) *mock.ExpectedAPICall[clientmodels.ModelCreateParams, models.APIResponse] {
+	return &mock.ExpectedAPICall[clientmodels.ModelCreateParams, models.APIResponse]{
 		Method:              http.MethodPost,
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts", expectedDatasetID),
 		ExpectedRequestBody: &expectedCreate,
@@ -21,7 +21,7 @@ func ModelCreate(expectedDatasetID string, modelID clientmodels.PennsieveSchemaI
 	}
 }
 
-func PropertiesCreate(expectedDatasetID string, modelID clientmodels.PennsieveSchemaID, expectedCreate clientmodels.PropertiesCreate) *mock.ExpectedAPICall[clientmodels.PropertiesCreate, []models.APIResponse] {
+func PropertiesCreate(expectedDatasetID string, modelID clientmodels.PennsieveSchemaID, expectedCreate clientmodels.PropertiesCreateParams) *mock.ExpectedAPICall[clientmodels.PropertiesCreateParams, []models.APIResponse] {
 	var apiResponse []models.APIResponse
 	for _, prop := range expectedCreate {
 		apiResponse = append(apiResponse, models.APIResponse{
@@ -29,7 +29,7 @@ func PropertiesCreate(expectedDatasetID string, modelID clientmodels.PennsieveSc
 			ID:   uuid.NewString(),
 		})
 	}
-	return &mock.ExpectedAPICall[clientmodels.PropertiesCreate, []models.APIResponse]{
+	return &mock.ExpectedAPICall[clientmodels.PropertiesCreateParams, []models.APIResponse]{
 		Method:              http.MethodPut,
 		APIPath:             fmt.Sprintf("/models/datasets/%s/concepts/%s/properties", expectedDatasetID, modelID),
 		ExpectedRequestBody: &expectedCreate,
